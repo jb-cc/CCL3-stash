@@ -49,7 +49,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.cc221012_cc221016.stash.BccStudent
+import com.cc221012_cc221016.stash.data.Entries
 import com.cc221012_cc221016.stash.R
 
 sealed class Screen(val route: String){
@@ -137,7 +137,7 @@ fun mainScreen(mainViewModel: MainViewModel){
         )
 
         Button(
-            onClick = { mainViewModel.save(BccStudent(name.text,uid.text)) },
+            onClick = { mainViewModel.save(Entries(name.text,uid.text)) },
             modifier = Modifier.padding(top = 20.dp)
         ) {
             Text(text = "Save", fontSize = 20.sp)
@@ -185,7 +185,7 @@ fun editStudentModal(mainViewModel: MainViewModel){
 
 
     if(state.value.openDialog){
-        val student = mainViewModel.bccStudentState.collectAsState()
+        val student = mainViewModel.entriesState.collectAsState()
         var name by rememberSaveable { mutableStateOf(student.value.name) }
         var uid by rememberSaveable { mutableStateOf(student.value.uid) }
 
@@ -211,7 +211,7 @@ fun editStudentModal(mainViewModel: MainViewModel){
                 }
             },
             confirmButton = {
-                Button( onClick = { mainViewModel.updateStudent(BccStudent(name,uid,student.value.id)) }) {
+                Button( onClick = { mainViewModel.updateStudent(Entries(name,uid,student.value.id)) }) {
                     Text("Confirm")
                 }
             }

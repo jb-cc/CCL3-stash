@@ -2,22 +2,21 @@ package com.cc221012_cc221016.stash.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cc221012_cc221016.stash.BccStudent
-import com.cc221012_cc221016.stash.data.StudentDao
+import com.cc221012_cc221016.stash.data.Entries
+import com.cc221012_cc221016.stash.data.EntriesDao
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class MainViewModel(private val dao: StudentDao): ViewModel() {
-    private val _bccStudentState = MutableStateFlow(BccStudent("",""))
-    val bccStudentState: StateFlow<BccStudent> = _bccStudentState.asStateFlow()
+class MainViewModel(private val dao: EntriesDao): ViewModel() {
+    private val _entriesState = MutableStateFlow(Entries("",""))
+    val entriesState: StateFlow<Entries> = _entriesState.asStateFlow()
     private val _mainViewState = MutableStateFlow(MainViewState())
     val mainViewState: StateFlow<MainViewState> = _mainViewState.asStateFlow()
 
-    fun save(student: BccStudent){
+    fun save(student: Entries){
         viewModelScope.launch {
             dao.insertStudent(student)
         }
@@ -31,12 +30,12 @@ class MainViewModel(private val dao: StudentDao): ViewModel() {
         }
     }
 
-    fun editStudent(student: BccStudent){
-        _bccStudentState.value = student
+    fun editStudent(student: Entries){
+        _entriesState.value = student
         _mainViewState.update { it.copy(openDialog = true) }
     }
 
-    fun updateStudent(student: BccStudent){
+    fun updateStudent(student: Entries){
         viewModelScope.launch {
             dao.updateStudent(student)
         }
@@ -48,7 +47,7 @@ class MainViewModel(private val dao: StudentDao): ViewModel() {
         _mainViewState.update { it.copy(openDialog = false) }
     }
 
-    fun deleteButton(student: BccStudent){
+    fun deleteButton(student: Entries){
         viewModelScope.launch {
             dao.deleteStudent(student)
         }

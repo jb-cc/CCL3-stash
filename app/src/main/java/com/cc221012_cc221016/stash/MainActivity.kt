@@ -11,14 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
-import com.cc221012_cc221016.stash.data.StudentsDatabase
+import com.cc221012_cc221016.stash.data.EntriesDatabase
 import com.cc221012_cc221016.stash.ui.MainView
 import com.cc221012_cc221016.stash.ui.MainViewModel
 import com.cc221012_cc221016.stash.ui.theme.stashTheme
 
 class MainActivity : ComponentActivity() {
     private val db by lazy{
-        Room.databaseBuilder(this, StudentsDatabase::class.java, "StudentsDatabase.db").build()
+        Room.databaseBuilder(this, EntriesDatabase::class.java, "StudentsDatabase.db").build()
     }
 
     // Do not initialize it as:
