@@ -2,8 +2,12 @@ package com.cc221012_cc221016.stash.models
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cc221012_cc221016.stash.data.BccStudent
-import com.cc221012_cc221016.stash.data.StudentDao
+import com.cc221012_cc221016.stash.data.Entries
+import com.cc221012_cc221016.stash.data.EntriesDao
+import com.cc221012_cc221016.stash.data.UsersDao
+import com.cc221012_cc221016.stash.data.EntriesDatabase
+import com.cc221012_cc221016.stash.data.Users
+import com.cc221012_cc221016.stash.data.UsersDatabase
 import com.cc221012_cc221016.stash.ui.views.Screen
 import com.cc221012_cc221016.stash.ui.state.MainViewState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,51 +16,107 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class MainViewModel(private val studentDao: StudentDao): ViewModel() {
-    private val _bccStudentState = MutableStateFlow(BccStudent("",""))
-    val bccStudentState: StateFlow<BccStudent> = _bccStudentState.asStateFlow()
+class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: UsersDao): ViewModel() {
+    //Entries
+    private val _entriesState = MutableStateFlow(Entries("","", "", ""))
+    val entriesState: StateFlow<Entries> = _entriesState.asStateFlow()
+
+    //Users
+    private val _usersState = MutableStateFlow(Users(""))
+    val usersState: StateFlow<Users> = _usersState.asStateFlow()
+
+    //MainViewState
     private val _mainViewState = MutableStateFlow(MainViewState())
     val mainViewState: StateFlow<MainViewState> = _mainViewState.asStateFlow()
 
-    fun save(student: BccStudent){
+
+
+    //ENTRIES METHODS
+
+    //Save an entry
+    fun saveEntry(entry: Entries){
         viewModelScope.launch {
-            dao.insertStudent(student)
+            entriesDao.insertEntry(entry)
         }
     }
 
-    fun getStudents(){
+    //Get all entries
+    fun getEntries(){
         viewModelScope.launch {
-            dao.getStudents().collect(){ allStudents ->
-                _mainViewState.update { it.copy(students = allStudents) }
+            entriesDao.getEntries().collect(){ allEntries ->
+                _mainViewState.update { it.copy(entries = allEntries) }
             }
         }
     }
 
-    fun editStudent(student: BccStudent){
-        _bccStudentState.value = student
+    //Get an entry
+    fun getEntry(id: Int){
+        viewModelScope.launch {
+            entriesDao.getEntry(id).collect(){ entry ->
+                _entriesState.update { entry }
+            }
+        }
+    }
+
+    //Update an entry
+    fun updateEntry(entry: Entries){
+        viewModelScope.launch {
+            entriesDao.updateEntry(entry)
+        }
+        getEntries()
+        closeDialog()
+    }
+
+    //edit an entry
+
+    fun editEntry(entry: Entries){
+        _entriesState.value = entry
         _mainViewState.update { it.copy(openDialog = true) }
     }
 
-    fun updateStudent(student: BccStudent){
+    //delete an entry
+
+    fun deleteEntry(entry: Entries){
         viewModelScope.launch {
-            dao.updateStudent(student)
+            entriesDao.deleteEntry(entry)
         }
-        getStudents()
-        closeDialog()
+        getEntries()
+    }
+
+
+    //USER METHODS
+
+    //Save a user
+    fun saveUser(user: Users){
+        viewModelScope.launch {
+            usersDao.insertUser(user)
+        }
+    }
+
+    //Get a user
+    fun getUsers(){
+        viewModelScope.launch {
+            usersDao.getUsers().collect(){ allUsers ->
+                _mainViewState.update { it.copy(users = allUsers) }
+            }
+        }
+    }
+
+    fun deleteUser(user: Users){
+        viewModelScope.launch {
+            usersDao.deleteUser(user)
+        }
+        getUsers()
+    }
+
+
+
+
+    fun selectScreen(screen: Screen){
+        _mainViewState.update { it.copy(selectedScreen = screen) }
     }
 
     fun closeDialog(){
         _mainViewState.update { it.copy(openDialog = false) }
-    }
-
-    fun deleteButton(student: BccStudent){
-        viewModelScope.launch {
-            dao.deleteStudent(student)
-        }
-        getStudents()
-    }
-
-    fun selectScreen(screen: Screen){
-        _mainViewState.update { it.copy(selectedScreen = screen) }
     }
 }
