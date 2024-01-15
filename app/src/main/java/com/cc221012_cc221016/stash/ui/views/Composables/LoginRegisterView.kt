@@ -1,6 +1,8 @@
 package com.cc221012_cc221016.stash.ui.views.Composables
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
@@ -16,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,38 +28,45 @@ fun LoginRegisterView(hasUser: Boolean) {
     var masterPassword by remember { mutableStateOf(TextFieldValue("")) }
     var repeatMasterPassword by remember { mutableStateOf(TextFieldValue("")) }
 
-    Column {
-        Text(
-            text = "Stash",
-            fontSize = 50.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        if (hasUser) {
-            OutlinedTextField(
-                value = password,
-                onValueChange = { newPassword -> password = newPassword },
-                label = { Text(text = "Master Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-            )
-        } else {
-            OutlinedTextField(
-                value = masterPassword,
-                onValueChange = { newMasterPassword -> masterPassword = newMasterPassword },
-                label = { Text(text = "MasterPassword") },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+    Box(contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Stash",
+                fontSize = 50.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 10.dp)
             )
 
-            OutlinedTextField(
-                value = repeatMasterPassword,
-                onValueChange = { newRepeatMasterPassword -> repeatMasterPassword = newRepeatMasterPassword },
-                label = { Text(text = "Repeat Master Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-            )
+            Column(modifier = Modifier.padding(top = 200.dp)) {
+                if (hasUser) {
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { newPassword -> password = newPassword },
+                        label = { Text(text = "Master Password") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = masterPassword,
+                        onValueChange = { newMasterPassword -> masterPassword = newMasterPassword },
+                        label = { Text(text = "MasterPassword") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+
+                    OutlinedTextField(
+                        value = repeatMasterPassword,
+                        onValueChange = { newRepeatMasterPassword -> repeatMasterPassword = newRepeatMasterPassword },
+                        label = { Text(text = "Repeat Master Password") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
+            }
         }
     }
 }
