@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.cc221012_cc221016.stash.BccStudent
 import kotlinx.coroutines.flow.Flow
 
 @Dao

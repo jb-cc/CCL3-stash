@@ -1,4 +1,4 @@
-package com.cc221012_cc221016.stash
+package com.cc221012_cc221016.stash.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

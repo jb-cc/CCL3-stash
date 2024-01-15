@@ -12,8 +12,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import com.cc221012_cc221016.stash.data.StudentsDatabase
-import com.cc221012_cc221016.stash.ui.MainView
-import com.cc221012_cc221016.stash.ui.MainViewModel
+import com.cc221012_cc221016.stash.ui.views.MainView
+import com.cc221012_cc221016.stash.models.MainViewModel
 import com.cc221012_cc221016.stash.ui.theme.stashTheme
 
 class MainActivity : ComponentActivity() {
