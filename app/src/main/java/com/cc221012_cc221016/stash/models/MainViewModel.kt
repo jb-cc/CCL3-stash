@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class MainViewModel(private val dao: StudentDao): ViewModel() {
+class MainViewModel(private val studentDao: StudentDao): ViewModel() {
     private val _bccStudentState = MutableStateFlow(BccStudent("",""))
     val bccStudentState: StateFlow<BccStudent> = _bccStudentState.asStateFlow()
     private val _mainViewState = MutableStateFlow(MainViewState())
