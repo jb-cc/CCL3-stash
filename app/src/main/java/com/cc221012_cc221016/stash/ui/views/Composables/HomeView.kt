@@ -22,7 +22,10 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import com.cc221012_cc221016.stash.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +62,9 @@ fun HomeView() {
                                     contentDescription = "User Icon",
                                     modifier = Modifier.padding(end = 8.dp)
                                 )
-                                Column {
+                                Column(
+                                    modifier = Modifier.weight(1f) // Add this line
+                                ) {
                                     Text(
                                         text = "Instagram",
                                         style = MaterialTheme.typography.titleMedium,
@@ -70,6 +75,10 @@ fun HomeView() {
                                         style = MaterialTheme.typography.bodyMedium,
                                     )
                                 }
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
+                                    contentDescription = "Copy Icon"
+                                )
                             }
                         }
                     }
