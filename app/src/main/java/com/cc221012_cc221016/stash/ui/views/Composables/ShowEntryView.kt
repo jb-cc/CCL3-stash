@@ -47,16 +47,17 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.cc221012_cc221016.stash.R
+import com.cc221012_cc221016.stash.data.Entries
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShowEntryView() {
+fun ShowEntryView(entry: Entries, onBack: () -> Unit) {
     val passwordVisibility = remember { mutableStateOf(false) }
-    val entryName = remember { mutableStateOf("Instagram") }
-    val url = remember { mutableStateOf("https://www.instagram.com/") }
-    val email = remember { mutableStateOf("yourname@email.com") }
-    val password = remember { mutableStateOf("password123") }
+    //val entryName = remember { mutableStateOf("Instagram") }
+    //val url = remember { mutableStateOf("https://www.instagram.com/") }
+    //val email = remember { mutableStateOf("yourname@email.com") }
+    //val password = remember { mutableStateOf("password123") }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -81,9 +82,9 @@ fun ShowEntryView() {
         ) {
 
             TopAppBar(
-                title = { Text(entryName.value) },
+                title = { Text(entry.entryName) },
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle back button click */ }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -150,7 +151,7 @@ fun ShowEntryView() {
 
             ListItem(
                 headlineText = { Text("URL") },
-                supportingText = { Text(url.value) },
+                supportingText = { Text(entry.entryUrl) },
                 leadingContent = {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.link),
@@ -163,7 +164,7 @@ fun ShowEntryView() {
 
             ListItem(
                 headlineText = { Text("Email") },
-                supportingText = { Text(email.value) },
+                supportingText = { Text(entry.entryUsername) },
                 leadingContent = {
                     Icon(
                         Icons.Outlined.Email,
@@ -176,7 +177,7 @@ fun ShowEntryView() {
 
             ListItem(
                 headlineText = { Text("Password") },
-                supportingText = { Text(if (passwordVisibility.value) password.value else "••••••••") },
+                supportingText = { Text(if (passwordVisibility.value) entry.entryPassword else "••••••••") },
                 leadingContent = {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.key),
@@ -208,7 +209,7 @@ fun ShowEntryView() {
                 onClick = {
                     coroutineScope.launch {
                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        val clip = ClipData.newPlainText("password", password.value)
+                        val clip = ClipData.newPlainText("password", entry.entryPassword)
                         clipboard.setPrimaryClip(clip)
 
                         snackbarHostState.showSnackbar("Password copied")

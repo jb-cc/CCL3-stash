@@ -39,7 +39,7 @@ import androidx.compose.ui.Alignment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeView(mainViewModel: MainViewModel) {
+fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Unit) {
     val colorScheme = darkColorScheme()
     val mainViewState by mainViewModel.mainViewState.collectAsState()
 
@@ -63,7 +63,7 @@ fun HomeView(mainViewModel: MainViewModel) {
                     LazyColumn {
                         items(mainViewState.entries) { entry ->
                                     OutlinedCard(
-                                        onClick = { /* Handle onClick - perhaps open a detail view or edit dialog */ },
+                                        onClick = { navigateToShowEntry(entry)  },
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(bottom = 16.dp)
