@@ -1,5 +1,8 @@
 package com.cc221012_cc221016.stash.ui.views.Composables
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,29 +14,39 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material3.Button
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.cc221012_cc221016.stash.R
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +57,13 @@ fun ShowEntryView() {
     val email = remember { mutableStateOf("yourname@email.com") }
     val password = remember { mutableStateOf("password123") }
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val menuExpanded = remember { mutableStateOf(false) }
+    val showDialog = remember { mutableStateOf(false) }
+
+
 
     Box(
         modifier = Modifier
@@ -58,6 +78,7 @@ fun ShowEntryView() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             TopAppBar(
                 title = { Text(entryName.value) },
                 navigationIcon = {
@@ -66,10 +87,56 @@ fun ShowEntryView() {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Handle button click */ }) {
+                    IconButton(onClick = { menuExpanded.value = true }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.three_dot_options),
                             contentDescription = "Options Icon"
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = menuExpanded.value,
+                        onDismissRequest = { menuExpanded.value = false }
+                    ) {
+                        DropdownMenuItem(
+                            onClick = { /* TODO: navigate to EditEntryView */ },
+                            text = { Text("Edit Entry") },
+                            leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = "Edit Icon") }
+                        )
+                        DropdownMenuItem(
+                            onClick = { showDialog.value = true },
+                            text = { Text("Delete Entry") },
+                            leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = "Delete Icon") }
+                        )
+                    }
+
+                    if (showDialog.value) {
+                        AlertDialog(
+                            onDismissRequest = { showDialog.value = false },
+                            title = { Text("Delete Credentials?") },
+                            text = { Text("This action cannot be undone.") },
+                            confirmButton = {
+                                TextButton(
+                                    onClick = {
+                                        // TODO: Delete entry
+                                        showDialog.value = false
+                                        menuExpanded.value = false
+                                    }
+                                ) {
+                                    Text("Delete", color = Color(0xFFDC362E))
+
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(
+                                    onClick = {
+                                        showDialog.value = false
+                                        menuExpanded.value = false
+                                    }
+                                ) {
+                                    Text("Cancel", color = colorScheme.primary)
+                                }
+                            }
                         )
                     }
                 },
@@ -78,27 +145,12 @@ fun ShowEntryView() {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            OutlinedTextField(
-                value = entryName.value,
-                onValueChange = { entryName.value = it },
-                label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.star),
-                        contentDescription = "Star Icon"
-                    )
-                },
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = url.value,
-                onValueChange = { url.value = it },
-                label = { Text("URL") },
-                modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
+            ListItem(
+                headlineText = { Text("URL") },
+                supportingText = { Text(url.value) },
+                leadingContent = {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.link),
                         contentDescription = "URL Icon"
@@ -106,14 +158,12 @@ fun ShowEntryView() {
                 },
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Divider()
 
-            OutlinedTextField(
-                value = email.value,
-                onValueChange = { email.value = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
+            ListItem(
+                headlineText = { Text("Email") },
+                supportingText = { Text(email.value) },
+                leadingContent = {
                     Icon(
                         Icons.Outlined.Email,
                         contentDescription = "Email Icon"
@@ -121,21 +171,18 @@ fun ShowEntryView() {
                 },
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Divider()
 
-            OutlinedTextField(
-                value = password.value,
-                onValueChange = { password.value = it },
-                label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
-                leadingIcon = {
+            ListItem(
+                headlineText = { Text("Password") },
+                supportingText = { Text(if (passwordVisibility.value) password.value else "••••••••") },
+                leadingContent = {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.key),
                         contentDescription = "Key Icon"
                     )
                 },
-                trailingIcon = {
+                trailingContent = {
                     IconButton(onClick = { passwordVisibility.value = !passwordVisibility.value }) {
                         Icon(
                             imageVector = if (passwordVisibility.value) ImageVector.vectorResource(id = R.drawable.visibility_on) else ImageVector.vectorResource(id = R.drawable.visibility_off),
@@ -144,19 +191,33 @@ fun ShowEntryView() {
                     }
                 }
             )
+
+            Divider()
         }
 
-        Button(
-            onClick = {},
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colorScheme.primary,
-                contentColor = colorScheme.onPrimary
+        OutlinedButton(
+            onClick = {
+                coroutineScope.launch {
+                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("password", password.value)
+                    clipboard.setPrimaryClip(clip)
+
+                    snackbarHostState.showSnackbar("Password copied")
+                }
+            },
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = colorScheme.primary
             ),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(0.9f)
         ) {
-            Text("Update Entry")
+            Text("Copy Password")
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
