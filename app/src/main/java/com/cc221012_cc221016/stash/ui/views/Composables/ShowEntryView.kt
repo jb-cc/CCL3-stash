@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -195,29 +196,31 @@ fun ShowEntryView() {
             Divider()
         }
 
-        OutlinedButton(
-            onClick = {
-                coroutineScope.launch {
-                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    val clip = ClipData.newPlainText("password", password.value)
-                    clipboard.setPrimaryClip(clip)
-
-                    snackbarHostState.showSnackbar("Password copied")
-                }
-            },
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = colorScheme.primary
-            ),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth(0.9f)
+        Column(
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text("Copy Password")
-        }
+            SnackbarHost(
+                hostState = snackbarHostState
+            )
+            OutlinedButton(
+                onClick = {
+                    coroutineScope.launch {
+                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        val clip = ClipData.newPlainText("password", password.value)
+                        clipboard.setPrimaryClip(clip)
 
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
+                        snackbarHostState.showSnackbar("Password copied")
+                    }
+                },
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = colorScheme.primary
+                ),
+                modifier = Modifier.fillMaxWidth(0.9f)
+            ) {
+                Text("Copy Password")
+            }
+        }
     }
 }
