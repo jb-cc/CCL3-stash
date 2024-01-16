@@ -1,5 +1,6 @@
 package com.cc221012_cc221016.stash.ui.views.Composables
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,11 +37,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.cc221012_cc221016.stash.R
+import com.cc221012_cc221016.stash.data.Entries
+import com.cc221012_cc221016.stash.models.MainViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEntryView() {
+fun AddEntryView(mainViewModel: MainViewModel) {
     val passwordVisibility = remember { mutableStateOf(false) }
     val nameValue = remember { mutableStateOf("") }
     val urlValue = remember { mutableStateOf("") }
@@ -181,7 +184,17 @@ fun AddEntryView() {
                         }
                     } else {
                         // Handle save entry
-                    }
+                        val newEntry = Entries(
+                            entryName = nameValue.value,
+                            entryUsername = emailValue.value,
+                            entryPassword = passwordValue.value,
+                            entryUrl = urlValue.value
+                        )
+                        mainViewModel.saveEntry(newEntry)
+                        Log.d("AddEntryView", "Entry saved")
+                        val test = mainViewModel.getEntries()
+                        Log.d("Give Entries", test.toString())
+                                }
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorScheme.primary,

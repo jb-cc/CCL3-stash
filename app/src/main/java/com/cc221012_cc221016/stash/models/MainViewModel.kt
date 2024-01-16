@@ -1,5 +1,6 @@
 package com.cc221012_cc221016.stash.models
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cc221012_cc221016.stash.data.Entries
@@ -37,13 +38,15 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
     fun saveEntry(entry: Entries){
         viewModelScope.launch {
             entriesDao.insertEntry(entry)
+            Log.d("MainViewModel", "saveEntry: ${entry.entryName}")
+            getEntries()
         }
     }
 
     //Get all entries
-    fun getEntries(){
+    fun getEntries() {
         viewModelScope.launch {
-            entriesDao.getEntries().collect(){ allEntries ->
+            entriesDao.getEntries().collect { allEntries ->
                 _mainViewState.update { it.copy(entries = allEntries) }
             }
         }
