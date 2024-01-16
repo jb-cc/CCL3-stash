@@ -20,4 +20,7 @@ interface EntriesDao {
 
     @Query("SELECT * FROM entries")
     fun getEntries(): Flow<List<Entries>>
+
+    @Query("SELECT * FROM entries WHERE entryID = :id")
+    fun getEntry(id: Int): Flow<Entries>
 }
