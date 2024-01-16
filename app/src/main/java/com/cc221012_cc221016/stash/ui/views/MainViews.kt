@@ -1,4 +1,18 @@
 package com.cc221012_cc221016.stash.ui.views
+
+import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.cc221012_cc221016.stash.data.Entries
+import com.cc221012_cc221016.stash.models.MainViewModel
+import com.cc221012_cc221016.stash.ui.views.Composables.HomeView
+import com.cc221012_cc221016.stash.ui.views.Composables.LoginRegisterView
+import com.cc221012_cc221016.stash.ui.views.Composables.ShowEntryView
+
 // ============================ AJ ======================================
 
 
@@ -89,3 +103,38 @@ package com.cc221012_cc221016.stash.ui.views
 ////        AddEntryView()
 ////        ShowEntryView()
 ////        EditEntryView()
+sealed class Screen(val route: String){
+    object First: Screen("first")
+    object Second: Screen("second")
+}
+
+@Composable
+fun MainView(mainViewModel: MainViewModel) {
+    val mainViewState by mainViewModel.mainViewState.collectAsState()
+    val users by mainViewModel.initialGetUsers().collectAsState(emptyList())
+    Log.d("MainView", "MainView: $mainViewState")
+    Log.d("MainView", "Got Users: $users")
+
+    var currentScreen by remember { mutableStateOf("Home") }
+    var selectedEntry by remember { mutableStateOf<Entries?>(null) } // State to hold the selected entry
+
+    if (mainViewState.isUserAuthenticated) {
+        when (currentScreen) {
+            "Home" -> HomeView(mainViewModel) { entry ->
+                selectedEntry = entry
+                currentScreen = "ShowEntry"
+            }
+            "ShowEntry" -> selectedEntry?.let {
+                ShowEntryView(it) {
+                    currentScreen = "Home" // This lambda sets the screen back to Home
+                }
+            }
+        }
+    } else {
+        if (users.isNotEmpty()) {
+            LoginRegisterView(users[0], mainViewModel)
+        } else {
+            LoginRegisterView(null, mainViewModel)
+        }
+    }
+}
