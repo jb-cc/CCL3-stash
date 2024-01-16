@@ -8,5 +8,6 @@ data class MainViewState(
     val entries: List<Entries> = emptyList(),
     val users: List<Users> = emptyList(),
     val selectedScreen: Screen = Screen.First,
-    val openDialog: Boolean = false
+    val openDialog: Boolean = false,
+    val isUserAuthenticated: Boolean = false
 )
