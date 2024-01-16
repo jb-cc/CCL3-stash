@@ -1,5 +1,6 @@
 package com.cc221012_cc221016.stash.models
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cc221012_cc221016.stash.data.Entries
@@ -10,6 +11,7 @@ import com.cc221012_cc221016.stash.data.Users
 import com.cc221012_cc221016.stash.data.UsersDatabase
 import com.cc221012_cc221016.stash.ui.views.Screen
 import com.cc221012_cc221016.stash.ui.state.MainViewState
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -90,18 +92,29 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
     fun saveUser(user: Users){
         viewModelScope.launch {
             usersDao.insertUser(user)
+            _mainViewState.update { it.copy(isUserAuthenticated = true) }
         }
     }
 
     //Get a user
     fun getUsers(){
+
         viewModelScope.launch {
             usersDao.getUsers().collect(){ allUsers ->
                 _mainViewState.update { it.copy(users = allUsers) }
+                Log.d("MainViewModel", "Fetched users: $allUsers")
+
             }
         }
     }
 
+    fun authenticateUser() {
+        _mainViewState.update { it.copy(isUserAuthenticated = true) }
+    }
+
+    fun initialGetUsers(): Flow<List<Users>> {
+        return usersDao.getUsers()
+    }
     fun deleteUser(user: Users){
         viewModelScope.launch {
             usersDao.deleteUser(user)

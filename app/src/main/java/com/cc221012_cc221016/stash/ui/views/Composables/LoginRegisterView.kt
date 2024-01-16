@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.cc221012_cc221016.stash.data.Users
 import com.cc221012_cc221016.stash.models.MainViewModel
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
@@ -64,67 +65,90 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                 modifier = Modifier.padding(top = 10.dp)
             )
 
-            Column(modifier = Modifier.padding(top = 200.dp)) {
+            Column(modifier = Modifier.padding(top = 100.dp)) {
                 if (user != null) {
-                    if (user.userID != 0) {
-                        OutlinedTextField(
-                            value = password,
-                            onValueChange = { newPassword -> if (newPassword.text.length <= 50) password = newPassword },
-                            label = { Text(text = "Master Password") },
-                            visualTransformation = PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                    } else {
-                        OutlinedTextField(
-                            value = masterPassword,
-                            onValueChange = { newMasterPassword -> if (newMasterPassword.text.length <= 50) masterPassword = newMasterPassword },
-                            label = { Text(text = "New MasterPassword") },
-                            visualTransformation = PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                            modifier = Modifier.align(Alignment.CenterHorizontally),
-                            supportingText = { PasswordRequirements(masterPassword.text) }
-                        )
-
-                        OutlinedTextField(
-                            value = repeatMasterPassword,
-                            onValueChange = { newRepeatMasterPassword -> if (newRepeatMasterPassword.text.length <= 50) repeatMasterPassword = newRepeatMasterPassword },
-                            label = { Text(text = "Repeat Master Password") },
-                            visualTransformation = PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-
+                    Box(modifier = Modifier.fillMaxSize()) {
                         Column(
-                            verticalArrangement = Arrangement.Bottom,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxSize()
+                            verticalArrangement = Arrangement.Center, // Center the contents vertically
+                            horizontalAlignment = Alignment.CenterHorizontally, // Center the contents horizontally
+                            modifier = Modifier.fillMaxSize() // Fill the maximum size
                         ) {
-                            SnackbarHost(
-                                hostState = snackbarHostState
+                            OutlinedTextField(
+                                value = password,
+                                onValueChange = { newPassword -> if (newPassword.text.length <= 50) password = newPassword },
+                                label = { Text(text = "Master Password") },
+                                visualTransformation = PasswordVisualTransformation(),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
                             )
-                            Button(
-                                onClick = {
-                                    if (isPasswordValid(masterPassword.text)) {
-                                        if (masterPassword.text == repeatMasterPassword.text) {
-                                            viewModel.saveUser(Users(masterPassword.text))
-                                        } else {
-                                            coroutineScope.launch {
-                                                snackbarHostState.showSnackbar("Passwords do not match")
-                                            }
-                                        }
+                        }
+
+                        Button(
+                            onClick = {
+                                // Check if the input password matches the user's master password
+                                if (password.text == user.userPassword) {
+                                    // If they match, update the state to authenticate the user
+                                    viewModel.authenticateUser()
+                                }
+                            },
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .fillMaxWidth(0.9f)
+                                .padding(bottom = 16.dp)
+                        ) {
+                            Text(text = "Log In")
+                        }
+                    }
+                } else {
+                    OutlinedTextField(
+                        value = masterPassword,
+                        onValueChange = { newMasterPassword -> if (newMasterPassword.text.length <= 50) masterPassword = newMasterPassword },
+                        label = { Text(text = "New MasterPassword") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        supportingText = { PasswordRequirements(masterPassword.text) }
+                    )
+
+                    OutlinedTextField(
+                        value = repeatMasterPassword,
+                        onValueChange = { newRepeatMasterPassword -> if (newRepeatMasterPassword.text.length <= 50) repeatMasterPassword = newRepeatMasterPassword },
+                        label = { Text(text = "Repeat Master Password") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+
+                    Column(
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        SnackbarHost(
+                            hostState = snackbarHostState
+                        )
+                        Button(
+                            onClick = {
+                                if (isPasswordValid(masterPassword.text)) {
+                                    if (masterPassword.text == repeatMasterPassword.text) {
+                                        val newUser = Users(masterPassword.text)
+                                        viewModel.saveUser(newUser)
                                     } else {
                                         coroutineScope.launch {
-                                            snackbarHostState.showSnackbar("Password does not meet the requirements")
+                                            snackbarHostState.showSnackbar("Passwords do not match")
                                         }
                                     }
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth(0.9f)
-                                    .padding(bottom = 16.dp)
-                            ) {
-                                Text(text = "Sign Up with MasterPassword")
-                            }
+                                } else {
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Password does not meet the requirements")
+                                    }
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                                .padding(bottom = 16.dp)
+                        ) {
+                            Text(text = "Sign Up with MasterPassword")
                         }
                     }
                 }
