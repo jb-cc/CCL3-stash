@@ -43,7 +43,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEntryView(mainViewModel: MainViewModel, onBack: () -> Unit, navigateToShowEntry: (Entries) -> Unit) {
+fun AddEntryView(
+    mainViewModel: MainViewModel,
+    onBack: () -> Unit,
+    navigateToShowEntry: (Entries) -> Unit
+) {
     val passwordVisibility = remember { mutableStateOf(false) }
     val nameValue = remember { mutableStateOf("") }
     val urlValue = remember { mutableStateOf("") }
@@ -173,41 +177,33 @@ fun AddEntryView(mainViewModel: MainViewModel, onBack: () -> Unit, navigateToSho
                         scope.launch {
                             snackbarHostState.showSnackbar("Please fill out all mandatory fields.")
                         }
-                        if (nameValue.value.isEmpty()) {
-                            nameOutlineColor.value = Color.Red
-                        }
-                        if (emailValue.value.isEmpty()) {
-                            emailOutlineColor.value = Color.Red
-                        }
-                        if (passwordValue.value.isEmpty()) {
-                            passwordOutlineColor.value = Color.Red
-                        }
+                        if (nameValue.value.isEmpty()) nameOutlineColor.value = Color.Red
+                        if (emailValue.value.isEmpty()) emailOutlineColor.value = Color.Red
+                        if (passwordValue.value.isEmpty()) passwordOutlineColor.value = Color.Red
                     } else {
-                        // Handle save entry
-                        val newEntry = Entries(
-                            entryName = nameValue.value,
-                            entryUsername = emailValue.value,
-                            entryPassword = passwordValue.value,
-                            entryUrl = urlValue.value
-                        )
-                        mainViewModel.saveEntry(newEntry)
-                        Log.d("AddEntryView", "Entry saved")
-                        val test = mainViewModel.getEntries()
-                        Log.d("Give Entries", test.toString())
                         scope.launch {
-                            snackbarHostState.showSnackbar("Entry added successfully.")
+                            try {
+                                val newEntry = Entries(
+                                    entryName = nameValue.value,
+                                    entryUsername = emailValue.value,
+                                    entryPassword = passwordValue.value,
+                                    entryUrl = urlValue.value
+                                )
+                                val entryID = mainViewModel.saveEntry(newEntry)
+                                val savedEntry = mainViewModel.getEntryById(entryID) // Use the ID to get the entry
+                                navigateToShowEntry(savedEntry) // Navigate with the fetched entry
+                            } catch (e: Exception) {
+                                Log.e("AddEntryView", "Error: ${e.message}")
+                                snackbarHostState.showSnackbar("Error saving entry")
+                            }
                         }
-                        navigateToShowEntry(newEntry) // Navigate to the ShowEntryView of this entry
-
-
-                                }
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorScheme.primary,
                     contentColor = colorScheme.onPrimary
                 ),
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
+                modifier = Modifier.fillMaxWidth(0.9f)
             ) {
                 Text("Save Entry")
             }

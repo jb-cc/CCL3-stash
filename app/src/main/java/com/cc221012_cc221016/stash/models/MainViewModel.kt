@@ -6,15 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.cc221012_cc221016.stash.data.Entries
 import com.cc221012_cc221016.stash.data.EntriesDao
 import com.cc221012_cc221016.stash.data.UsersDao
-import com.cc221012_cc221016.stash.data.EntriesDatabase
 import com.cc221012_cc221016.stash.data.Users
-import com.cc221012_cc221016.stash.data.UsersDatabase
 import com.cc221012_cc221016.stash.ui.views.Screen
 import com.cc221012_cc221016.stash.ui.state.MainViewState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -35,16 +35,37 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
     private val _mainViewState = MutableStateFlow(MainViewState())
     val mainViewState: StateFlow<MainViewState> = _mainViewState.asStateFlow()
 
+    private val _selectedEntry = MutableStateFlow<Entries?>(null)
+    val selectedEntry: StateFlow<Entries?> = _selectedEntry.asStateFlow()
 
 
     //ENTRIES METHODS
 
     //Save an entry
+    /*
     fun saveEntry(entry: Entries){
         viewModelScope.launch {
             entriesDao.insertEntry(entry)
             Log.d("MainViewModel", "saveEntry: ${entry.entryName}")
             getEntries()
+        }
+    }
+
+    */
+    suspend fun saveEntry(entry: Entries): Long {
+        val id = entriesDao.insertEntry(entry)
+        getEntries() // Update entries list
+        return id // Return the generated ID
+    }
+
+    suspend fun getEntryById(id: Int): Entries {
+        return entriesDao.getEntry(id).first()
+    }
+
+    fun fetchEntryById(id: Long) {
+        viewModelScope.launch {
+            val entry = entriesDao.getEntry(id).firstOrNull()
+            _selectedEntry.value = entry
         }
     }
 
@@ -60,7 +81,7 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
 
 
     //Get an entry
-    fun getEntry(id: Int){
+    fun getEntry(id: Long){
         viewModelScope.launch {
             entriesDao.getEntry(id).collect(){ entry ->
                 _entriesState.update { entry }
@@ -85,12 +106,19 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
 
     //delete an entry
 
-    fun deleteEntry(entry: Entries){
+    fun deleteEntry(entry: Entries) {
         viewModelScope.launch {
-            entriesDao.deleteEntry(entry)
+            try {
+                entriesDao.deleteEntry(entry)
+                getEntries()
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error deleting entry: ${e.message}")
+                // Handle the exception appropriately
+            }
         }
-        getEntries()
     }
+
+
 
 
     //USER METHODS
