@@ -69,12 +69,11 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
     }
 
     //Update an entry
-    fun updateEntry(entry: Entries){
+    fun updateEntry(entry: Entries) {
         viewModelScope.launch {
             entriesDao.updateEntry(entry)
+            getEntries() // Refresh the list of entries
         }
-        getEntries()
-        closeDialog()
     }
 
     //edit an entry

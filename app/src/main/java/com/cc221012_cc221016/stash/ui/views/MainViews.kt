@@ -60,15 +60,15 @@ fun MainView(mainViewModel: MainViewModel) {
                 selectedEntry = entry
                 currentScreen = "ShowEntry"
             })
-            "EditEntry" -> selectedEntry?.let {
-                EditEntryView(it, onBack = {
-                    currentScreen = "ShowEntry"
-                }, onSave = { updatedEntry ->
-                    mainViewModel.updateEntry(updatedEntry) // Update entry in the database
-                    selectedEntry = updatedEntry // Update the selected entry with new details
-                    currentScreen = "ShowEntry" // Navigate back to the ShowEntryView with updated entry
-                })
-            }
+            "EditEntry" -> selectedEntry?.let { entry ->
+            EditEntryView(entry, onBack = {
+                currentScreen = "ShowEntry"
+            }, onSave = { updatedEntry ->
+                mainViewModel.updateEntry(updatedEntry)
+                selectedEntry = updatedEntry // Update the selected entry
+                currentScreen = "ShowEntry"
+            })
+        }
         }
     } else {
         if (users.isNotEmpty()) {

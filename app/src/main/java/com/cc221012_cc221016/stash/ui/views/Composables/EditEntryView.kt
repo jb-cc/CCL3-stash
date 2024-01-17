@@ -42,10 +42,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit) {
     val passwordVisibility = remember { mutableStateOf(false) }
-    val nameValue = remember { mutableStateOf("Instagram") }
-    val urlValue = remember { mutableStateOf("https://www.instagram.com/") }
-    val emailValue = remember { mutableStateOf("yourname@mail.com") }
-    val passwordValue = remember { mutableStateOf("password123") }
+
+    // Initialize state with actual entry data
+    val nameValue = remember { mutableStateOf(entry.entryName) }
+    val urlValue = remember { mutableStateOf(entry.entryUrl) }
+    val emailValue = remember { mutableStateOf(entry.entryUsername) }
+    val passwordValue = remember { mutableStateOf(entry.entryPassword) }
+
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -74,7 +77,7 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
             Spacer(modifier = Modifier.height(32.dp))
 
             OutlinedTextField(
-                value = entry.entryUsername,
+                value = nameValue.value,
                 onValueChange = { nameValue.value = it },
                 label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth(),
@@ -160,9 +163,10 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
                         entryUsername = emailValue.value,
                         entryPassword = passwordValue.value,
                         entryUrl = urlValue.value,
-                        entryID = entry.entryID // Make sure to pass the original ID!
+                        entryID = entry.entryID // Preserve the original ID
                     )
                     onSave(updatedEntry) // Save the updated entry
+                    // Rest of your onClick logic here...
                 },
                 // ... other button properties ...
             ) {

@@ -89,10 +89,12 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                                                     .padding(end = 8.dp)
                                             ) {
                                                 Text(
-                                                    text = entry.entryName.take(1).uppercase(),
+                                                    text = "  "+ entry.entryName.take(1).uppercase(),
                                                     style = MaterialTheme.typography.titleMedium,
                                                     color = Color.White,
-                                                    modifier =  Modifier.align(Alignment.Center)
+                                                    modifier = Modifier.align(Alignment.Center)
+
+
                                                 )
                                             }
                                             Spacer(modifier = Modifier.width(16.dp)) // Add spacing here
