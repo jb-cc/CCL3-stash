@@ -32,14 +32,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.cc221012_cc221016.stash.data.Users
 import com.cc221012_cc221016.stash.models.MainViewModel
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
@@ -83,20 +81,30 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                             )
                         }
 
-                        Button(
-                            onClick = {
-                                // Check if the input password matches the user's master password
-                                if (password.text == user.userPassword) {
-                                    // If they match, update the state to authenticate the user
-                                    viewModel.authenticateUser()
-                                }
-                            },
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .fillMaxWidth(0.9f)
-                                .padding(bottom = 16.dp)
+                        Column(
+                            verticalArrangement = Arrangement.Bottom,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxSize()
                         ) {
-                            Text(text = "Log In")
+                            SnackbarHost(
+                                hostState = snackbarHostState
+                            )
+                            Button(
+                                onClick = {
+                                    if (password.text == user.userPassword) {
+                                        viewModel.authenticateUser()
+                                    } else {
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar("Incorrect password")
+                                        }
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth(0.9f)
+                                    .padding(bottom = 16.dp)
+                            ) {
+                                Text(text = "Log In")
+                            }
                         }
                     }
                 } else {
