@@ -74,7 +74,7 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
             Spacer(modifier = Modifier.height(32.dp))
 
             OutlinedTextField(
-                value = nameValue.value,
+                value = entry.entryUsername,
                 onValueChange = { nameValue.value = it },
                 label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth(),

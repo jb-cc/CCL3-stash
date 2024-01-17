@@ -19,6 +19,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: UsersDao): ViewModel() {
+    init {
+        getEntries() // Fetch entries when ViewModel is created
+    }
+
     //Entries
     private val _entriesState = MutableStateFlow(Entries("","", "", ""))
     val entriesState: StateFlow<Entries> = _entriesState.asStateFlow()
@@ -48,10 +52,12 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
     fun getEntries() {
         viewModelScope.launch {
             entriesDao.getEntries().collect { allEntries ->
+                Log.d("MainViewModel", "Fetched entries: $allEntries")
                 _mainViewState.update { it.copy(entries = allEntries) }
             }
         }
     }
+
 
     //Get an entry
     fun getEntry(id: Int){
