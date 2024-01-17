@@ -58,7 +58,7 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
         return id // Return the generated ID
     }
 
-    suspend fun getEntryById(id: Int): Entries {
+    suspend fun getEntryById(id: Long): Entries {
         return entriesDao.getEntry(id).first()
     }
 

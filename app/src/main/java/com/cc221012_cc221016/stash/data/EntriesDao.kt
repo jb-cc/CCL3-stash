@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface EntriesDao {
     @Insert
-    suspend fun insertEntry(entry: Entries) : Long
+    suspend fun insertEntry(entry: Entries) :Long
 
     @Update
     suspend fun updateEntry(entry: Entries)
@@ -22,5 +22,5 @@ interface EntriesDao {
     fun getEntries(): Flow<List<Entries>>
 
     @Query("SELECT * FROM entries WHERE entryID = :id")
-    fun getEntry(id: Int): Flow<Entries>
+    fun getEntry(id: Long): Flow<Entries>
 }

@@ -189,9 +189,9 @@ fun AddEntryView(
                                     entryPassword = passwordValue.value,
                                     entryUrl = urlValue.value
                                 )
-                                val entryID = mainViewModel.saveEntry(newEntry)
-                                val savedEntry = mainViewModel.getEntryById(entryID) // Use the ID to get the entry
-                                navigateToShowEntry(savedEntry) // Navigate with the fetched entry
+                                val entryId = mainViewModel.saveEntry(newEntry)
+                                val savedEntry = mainViewModel.getEntryById(entryId)
+                                navigateToShowEntry(savedEntry)
                             } catch (e: Exception) {
                                 Log.e("AddEntryView", "Error: ${e.message}")
                                 snackbarHostState.showSnackbar("Error saving entry")

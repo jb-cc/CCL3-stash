@@ -35,8 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,8 +55,8 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-suspend fun ShowEntryView(
-    entryId: Int,
+fun ShowEntryView(
+    entryId: Long,
     onBack: () -> Unit,
     mainViewModel: MainViewModel,
     onEditEntry: (Entries) -> Unit,
@@ -74,7 +73,13 @@ suspend fun ShowEntryView(
     val snackbarHostState = remember { SnackbarHostState() }
     val menuExpanded = remember { mutableStateOf(false) }
     val showDialog = remember { mutableStateOf(false) }
-    val entry by mainViewModel.getEntryById(entryId).collectAsState(initial = null)
+    val entryState = remember { mutableStateOf<Entries?>(null) }
+
+    LaunchedEffect(entryId) {
+        entryState.value = mainViewModel.getEntryById(entryId)
+    }
+
+    val entry = entryState.value
 
 
 
@@ -94,7 +99,7 @@ suspend fun ShowEntryView(
             ) {
 
                 TopAppBar(
-                    title = { Text(entry!!.entryName) },
+                    title = { Text(entry.entryName) },
                     navigationIcon = {
                         IconButton(onClick = { onBack() }) {
                             Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
@@ -115,7 +120,7 @@ suspend fun ShowEntryView(
                             DropdownMenuItem(
                                 onClick = {
                                     menuExpanded.value = false
-                                    onEditEntry(entry!!) // Navigate to the EditEntryView
+                                    onEditEntry(entry) // Navigate to the EditEntryView
                                 },
                                 text = { Text("Edit Entry") },
                                 leadingIcon = {
@@ -145,7 +150,7 @@ suspend fun ShowEntryView(
                                 confirmButton = {
                                     TextButton(
                                         onClick = {
-                                            onDeleteEntry(entry!!) // Delete the entry
+                                            onDeleteEntry(entry) // Delete the entry
                                             showDialog.value = false
                                             menuExpanded.value = false
                                             onBack() // Navigate back after deletion
@@ -176,7 +181,7 @@ suspend fun ShowEntryView(
 
                 ListItem(
                     headlineText = { Text("URL") },
-                    supportingText = { Text(entry!!.entryUrl) },
+                    supportingText = { Text(entry.entryUrl) },
                     leadingContent = {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.link),
@@ -189,7 +194,7 @@ suspend fun ShowEntryView(
 
                 ListItem(
                     headlineText = { Text("Email") },
-                    supportingText = { Text(entry!!.entryUsername) },
+                    supportingText = { Text(entry.entryUsername) },
                     leadingContent = {
                         Icon(
                             Icons.Outlined.Email,
@@ -202,7 +207,7 @@ suspend fun ShowEntryView(
 
                 ListItem(
                     headlineText = { Text("Password") },
-                    supportingText = { Text(if (passwordVisibility.value) entry!!.entryPassword else "••••••••") },
+                    supportingText = { Text(if (passwordVisibility.value) entry.entryPassword else "••••••••") },
                     leadingContent = {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.key),
@@ -239,7 +244,7 @@ suspend fun ShowEntryView(
                         coroutineScope.launch {
                             val clipboard =
                                 context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            val clip = ClipData.newPlainText("password", entry!!.entryPassword)
+                            val clip = ClipData.newPlainText("password", entry.entryPassword)
                             clipboard.setPrimaryClip(clip)
 
                             snackbarHostState.showSnackbar("Password copied")

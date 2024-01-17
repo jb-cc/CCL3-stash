@@ -44,16 +44,23 @@ fun MainView(mainViewModel: MainViewModel) {
                 }
             )
             "ShowEntry" -> selectedEntry?.let { entry ->
-                ShowEntryView(entry, onBack = {
-                    currentScreen = "Home"
-                }, onDeleteEntry = { entryToDelete ->
-                    mainViewModel.deleteEntry(entryToDelete)
-                    currentScreen = "Home"
-                }, onEditEntry = { entryToEdit ->
-                    selectedEntry = entryToEdit
-                    currentScreen = "EditEntry"
-                })
+                ShowEntryView(
+                    entryId = entry.entryID.toLong(),
+                    onBack = {
+                        currentScreen = "Home"
+                    },
+                    onDeleteEntry = { entryToDelete ->
+                        mainViewModel.deleteEntry(entryToDelete)
+                        currentScreen = "Home"
+                    },
+                    onEditEntry = { entryToEdit ->
+                        selectedEntry = entryToEdit
+                        currentScreen = "EditEntry"
+                    },
+                    mainViewModel = mainViewModel // Add this line
+                )
             }
+
             "AddEntry" -> AddEntryView(mainViewModel, onBack = {
                 currentScreen = "Home"
             }, navigateToShowEntry = { entry ->
