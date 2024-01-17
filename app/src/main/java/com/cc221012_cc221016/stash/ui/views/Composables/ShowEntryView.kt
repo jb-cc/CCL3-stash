@@ -3,6 +3,7 @@ package com.cc221012_cc221016.stash.ui.views.Composables
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -80,6 +81,9 @@ fun ShowEntryView(
     }
 
     val entry = entryState.value
+    BackHandler {
+        onBack()  // Define what should happen when back is pressed
+    }
 
 
 

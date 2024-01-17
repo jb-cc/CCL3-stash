@@ -1,6 +1,7 @@
 package com.cc221012_cc221016.stash.ui.views.Composables
 
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,9 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    BackHandler {
+        onBack()  // Define what should happen when back is pressed
+    }
 
 
     Box(
