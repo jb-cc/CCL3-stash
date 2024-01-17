@@ -1,8 +1,11 @@
 package com.cc221012_cc221016.stash.ui.views.Composables
 
+import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.Context
 import android.util.Log
+import android.webkit.WebView
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,11 +46,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.cc221012_cc221016.stash.R
 import com.cc221012_cc221016.stash.data.Entries
 import com.cc221012_cc221016.stash.models.MainViewModel
 import kotlinx.coroutines.launch
-
+import coil.compose.rememberImagePainter
+import android.webkit.URLUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +87,9 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            Column(modifier = Modifier.padding(16.dp).padding(top = 50.dp)) {
+            Column(modifier = Modifier
+                .padding(16.dp)
+                .padding(top = 50.dp)) {
 
 
                 // Ensure LazyColumn is not in an unbounded vertically expandable container
@@ -102,22 +109,19 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                                     modifier = Modifier.padding(16.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                            Box(
-                                                contentAlignment = Alignment.Center,
-                                                modifier = Modifier
-                                                    .size(40.dp)
-                                                    .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
-                                                    .padding(end = 8.dp)
-                                            ) {
-                                                Text(
-                                                    text = "  "+ entry.entryName.take(1).uppercase(),
-                                                    style = MaterialTheme.typography.titleMedium,
-                                                    color = Color.White,
-                                                    modifier = Modifier.align(Alignment.Center)
-
-
-                                                )
-                                            }
+                                    // Load and display the favicon or the initial letter
+                                    if (isValidUrl(entry.entryUrl)) {
+                                        val faviconUrl = getFaviconUrl(entry.entryUrl )
+                                        Log.d("HomeView", "Loading favicon for URL: $faviconUrl")
+                                        Image(
+                                            painter = rememberAsyncImagePainter(faviconUrl),
+                                            contentDescription = "Favicon",
+                                            modifier = Modifier.size(40.dp)
+                                        )
+                                    } else {
+                                        Log.d("HomeView", "Invalid URL, showing initial: ${entry.entryName}")
+                                        EntryInitial(entryName = entry.entryName)
+                                    }
                                             Spacer(modifier = Modifier.width(16.dp)) // Add spacing here
 
                                             Column(
@@ -182,5 +186,40 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
 
 }
 
+fun isValidUrl(url: String): Boolean {
+    // Check if the URL already has a scheme
+    if (!url.contains(".")) {
+        return false
+    }
+    if (!url.startsWith("://") && !url.startsWith("https://")) {
+        // Append a default scheme if it's missing
+        return URLUtil.isValidUrl("http://$url")
+    }
+    // URL has a scheme, check it directly
 
+    return URLUtil.isValidUrl(url)
+}
 
+@SuppressLint("RememberReturnType")
+@Composable
+fun getFaviconUrl(url: String): String {
+    Log.d("HomeView", "getFaviconUrl: $url")
+    val website = "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://$url&size=64"
+    return website
+}
+@Composable
+fun EntryInitial(entryName: String) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(40.dp)
+            .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
+            .padding(end = 8.dp)
+    ) {
+        Text(
+            text = "  " + entryName.take(1).uppercase(),
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.White
+        )
+    }
+}

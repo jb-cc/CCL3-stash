@@ -74,6 +74,10 @@ dependencies {
     // SQL Cipher
     implementation("net.zetetic:android-database-sqlcipher:4.4.3")
 
+    //Coil
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+
     // ELSE
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
