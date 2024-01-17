@@ -1,10 +1,11 @@
 package com.cc221012_cc221016.stash.ui.views.Composables
 
+import android.content.ClipData
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,30 +19,33 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.cc221012_cc221016.stash.R
 import com.cc221012_cc221016.stash.data.Entries
 import com.cc221012_cc221016.stash.models.MainViewModel
-import kotlin.random.Random
-
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,6 +54,10 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
     val colorScheme = darkColorScheme()
     val mainViewState by mainViewModel.mainViewState.collectAsState()
     Log.d("HomeView", "Recomposing with entries: ${mainViewState.entries}")
+    val context = LocalContext.current
+    val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     MaterialTheme(colorScheme = colorScheme) {
         Box(
@@ -70,17 +78,16 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                 } else {
                     LazyColumn {
                         items(mainViewState.entries) { entry ->
-                                    OutlinedCard(
-                                        onClick = { navigateToShowEntry(entry)  },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(bottom = 16.dp)
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.padding(16.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
-
-                                        ) {
+                            OutlinedCard(
+                                onClick = { navigateToShowEntry(entry)  },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
                                             Box(
                                                 contentAlignment = Alignment.Center,
                                                 modifier = Modifier
@@ -113,12 +120,18 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                                                 )
                                                 // You can add more fields here as needed
                                             }
-                                            IconButton(onClick = { /* Handle icon button click - perhaps copy info to clipboard */ }) {
-                                                Icon(
-                                                    imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
-                                                    contentDescription = "Copy Icon"
-                                                )
-                                            }
+                                    IconButton(onClick = {
+                                        val clip = ClipData.newPlainText("password", entry.entryPassword)
+                                        clipboardManager.setPrimaryClip(clip)
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Password copied to clipboard")
+                                        }
+                                    }) {
+                                        Icon(
+                                            imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
+                                            contentDescription = "Copy Icon"
+                                        )
+                                    }
                                         }
                                     }
                                 }
@@ -142,10 +155,18 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                     .align(Alignment.BottomEnd)
                     .padding(16.dp)
             )
-                }
-            }
-
+        }
     }
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
+
+}
 
 
 
