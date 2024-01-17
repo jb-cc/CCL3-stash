@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -60,16 +61,29 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
     val snackbarHostState = remember { SnackbarHostState() }
 
     MaterialTheme(colorScheme = colorScheme) {
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
         ) {
-            Column {
+
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Top
+            ) {
                 TopAppBar(
-                    title = { Text("Your Stash") },
+                    title = {
+                        Row(Modifier.fillMaxWidth()) {
+                            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                                Text("Your Stash")
+                            }
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
+            }
+            Column(modifier = Modifier.padding(16.dp).padding(top = 50.dp)) {
+
 
                 // Ensure LazyColumn is not in an unbounded vertically expandable container
                 if (mainViewState.entries.isEmpty()) {
