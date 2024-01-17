@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEntryView(mainViewModel: MainViewModel) {
+fun AddEntryView(mainViewModel: MainViewModel, onBack: () -> Unit, navigateToShowEntry: (Entries) -> Unit) {
     val passwordVisibility = remember { mutableStateOf(false) }
     val nameValue = remember { mutableStateOf("") }
     val urlValue = remember { mutableStateOf("") }
@@ -70,7 +70,7 @@ fun AddEntryView(mainViewModel: MainViewModel) {
             TopAppBar(
                 title = { Text("Add Entry") },
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle back button click */ }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -194,6 +194,12 @@ fun AddEntryView(mainViewModel: MainViewModel) {
                         Log.d("AddEntryView", "Entry saved")
                         val test = mainViewModel.getEntries()
                         Log.d("Give Entries", test.toString())
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Entry added successfully.")
+                        }
+                        navigateToShowEntry(newEntry) // Navigate to the ShowEntryView of this entry
+
+
                                 }
                 },
                 colors = ButtonDefaults.buttonColors(

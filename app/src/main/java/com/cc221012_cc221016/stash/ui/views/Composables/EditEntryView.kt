@@ -35,11 +35,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.cc221012_cc221016.stash.R
+import com.cc221012_cc221016.stash.data.Entries
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditEntryView() {
+fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit) {
     val passwordVisibility = remember { mutableStateOf(false) }
     val nameValue = remember { mutableStateOf("Instagram") }
     val urlValue = remember { mutableStateOf("https://www.instagram.com/") }
@@ -61,9 +62,9 @@ fun EditEntryView() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             TopAppBar(
-                title = { Text("Edit") },
+                title = { Text("Edit Entry") },
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle back button click */ }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -153,18 +154,21 @@ fun EditEntryView() {
             )
             Button(
                 onClick = {
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Entry updated")
-                    }
+                    // Construct updated entry from user input
+                    val updatedEntry = Entries(
+                        entryName = nameValue.value,
+                        entryUsername = emailValue.value,
+                        entryPassword = passwordValue.value,
+                        entryUrl = urlValue.value,
+                        entryID = entry.entryID // Make sure to pass the original ID!
+                    )
+                    onSave(updatedEntry) // Save the updated entry
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorScheme.primary,
-                    contentColor = colorScheme.onPrimary
-                ),
-                modifier = Modifier.fillMaxWidth(0.9f)
+                // ... other button properties ...
             ) {
                 Text("Update Entry")
             }
+
 
 
         }

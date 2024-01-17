@@ -39,7 +39,7 @@ import androidx.compose.ui.Alignment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Unit) {
+fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Unit, onAddEntryClick: () -> Unit) {
     val colorScheme = darkColorScheme()
     val mainViewState by mainViewModel.mainViewState.collectAsState()
 
@@ -110,8 +110,9 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
             ExtendedFloatingActionButton(
                 onClick = {
                     // Handle the logic to add a new entry
-                    val newEntry = Entries("Test", "user@example.com", "password", "https://example.com")
-                    mainViewModel.saveEntry(newEntry)
+                    //val newEntry = Entries("Test", "user@example.com", "password", "https://example.com")
+                    //mainViewModel.saveEntry(newEntry)
+                    onAddEntryClick()
                 },
                 icon = { Icon(Icons.Outlined.Edit, contentDescription = "Edit") },
                 text = { Text("Add entry") },

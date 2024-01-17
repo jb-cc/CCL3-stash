@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShowEntryView(entry: Entries, onBack: () -> Unit) {
+fun ShowEntryView(entry: Entries, onBack: () -> Unit,  onDeleteEntry: (Entries) -> Unit , onEditEntry: (Entries) -> Unit) {
     val passwordVisibility = remember { mutableStateOf(false) }
     //val entryName = remember { mutableStateOf("Instagram") }
     //val url = remember { mutableStateOf("https://www.instagram.com/") }
@@ -101,7 +101,10 @@ fun ShowEntryView(entry: Entries, onBack: () -> Unit) {
                         onDismissRequest = { menuExpanded.value = false }
                     ) {
                         DropdownMenuItem(
-                            onClick = { /* TODO: navigate to EditEntryView */ },
+                            onClick = {
+                                menuExpanded.value = false
+                                onEditEntry(entry) // Navigate to the EditEntryView
+                            },
                             text = { Text("Edit Entry") },
                             leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = "Edit Icon") }
                         )
@@ -120,13 +123,13 @@ fun ShowEntryView(entry: Entries, onBack: () -> Unit) {
                             confirmButton = {
                                 TextButton(
                                     onClick = {
-                                        // TODO: Delete entry
+                                        onDeleteEntry(entry) // Delete the entry
                                         showDialog.value = false
                                         menuExpanded.value = false
+                                        onBack() // Navigate back after deletion
                                     }
                                 ) {
                                     Text("Delete", color = Color(0xFFDC362E))
-
                                 }
                             },
                             dismissButton = {
