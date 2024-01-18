@@ -28,6 +28,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHost
@@ -87,185 +88,187 @@ fun ShowEntryView(
 
 
 
-    if(entry != null) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = { focusManager.clearFocus() })
-                }
-        ) {
-            Column(
+    MaterialTheme(colorScheme = colorScheme){
+        if (entry != null) {
+            Box(
                 modifier = Modifier
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                TopAppBar(
-                    title = { Text(entry.entryName) },
-                    navigationIcon = {
-                        IconButton(onClick = { onBack() }) {
-                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { menuExpanded.value = true }) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.three_dot_options),
-                                contentDescription = "Options Icon"
-                            )
-                        }
-
-                        DropdownMenu(
-                            expanded = menuExpanded.value,
-                            onDismissRequest = { menuExpanded.value = false }
-                        ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    menuExpanded.value = false
-                                    onEditEntry(entry) // Navigate to the EditEntryView
-                                },
-                                text = { Text("Edit Entry") },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Filled.Edit,
-                                        contentDescription = "Edit Icon"
-                                    )
-                                }
-                            )
-                            DropdownMenuItem(
-                                onClick = { showDialog.value = true },
-                                text = { Text("Delete Entry") },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Filled.Delete,
-                                        contentDescription = "Delete Icon"
-                                    )
-                                }
-                            )
-                        }
-
-                        if (showDialog.value) {
-                            AlertDialog(
-                                onDismissRequest = { showDialog.value = false },
-                                title = { Text("Delete Credentials?") },
-                                text = { Text("This action cannot be undone.") },
-                                confirmButton = {
-                                    TextButton(
-                                        onClick = {
-                                            onDeleteEntry(entry) // Delete the entry
-                                            showDialog.value = false
-                                            menuExpanded.value = false
-                                            onBack() // Navigate back after deletion
-                                        }
-                                    ) {
-                                        Text("Delete", color = Color(0xFFDC362E))
-                                    }
-                                },
-                                dismissButton = {
-                                    TextButton(
-                                        onClick = {
-                                            showDialog.value = false
-                                            menuExpanded.value = false
-                                        }
-                                    ) {
-                                        Text("Cancel", color = colorScheme.primary)
-                                    }
-                                }
-                            )
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-
-
-                ListItem(
-                    headlineText = { Text("URL") },
-                    supportingText = { Text(entry.entryUrl) },
-                    leadingContent = {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.link),
-                            contentDescription = "URL Icon"
-                        )
-                    },
-                )
-
-                Divider()
-
-                ListItem(
-                    headlineText = { Text("Email") },
-                    supportingText = { Text(entry.entryUsername) },
-                    leadingContent = {
-                        Icon(
-                            Icons.Outlined.Email,
-                            contentDescription = "Email Icon"
-                        )
-                    },
-                )
-
-                Divider()
-
-                ListItem(
-                    headlineText = { Text("Password") },
-                    supportingText = { Text(if (passwordVisibility.value) entry.entryPassword else "••••••••") },
-                    leadingContent = {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.key),
-                            contentDescription = "Key Icon"
-                        )
-                    },
-                    trailingContent = {
-                        IconButton(onClick = {
-                            passwordVisibility.value = !passwordVisibility.value
-                        }) {
-                            Icon(
-                                imageVector = if (passwordVisibility.value) ImageVector.vectorResource(
-                                    id = R.drawable.visibility_on
-                                ) else ImageVector.vectorResource(id = R.drawable.visibility_off),
-                                contentDescription = if (passwordVisibility.value) "Hide password" else "Show password"
-                            )
-                        }
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTapGestures(onTap = { focusManager.clearFocus() })
                     }
-                )
-
-                Divider()
-            }
-
-            Column(
-                verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
             ) {
-                SnackbarHost(
-                    hostState = snackbarHostState
-                )
-                OutlinedButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            val clipboard =
-                                context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            val clip = ClipData.newPlainText("password", entry.entryPassword)
-                            clipboard.setPrimaryClip(clip)
-
-                            snackbarHostState.showSnackbar("Password copied")
-                        }
-                    },
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = colorScheme.primary
-                    ),
-                    modifier = Modifier.fillMaxWidth(0.9f)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Top
                 ) {
-                    Text("Copy Password")
+
+                    TopAppBar(
+                        title = { Text(entry.entryName) },
+                        navigationIcon = {
+                            IconButton(onClick = { onBack() }) {
+                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        },
+                        actions = {
+                            IconButton(onClick = { menuExpanded.value = true }) {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.three_dot_options),
+                                    contentDescription = "Options Icon"
+                                )
+                            }
+
+                            DropdownMenu(
+                                expanded = menuExpanded.value,
+                                onDismissRequest = { menuExpanded.value = false }
+                            ) {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        menuExpanded.value = false
+                                        onEditEntry(entry) // Navigate to the EditEntryView
+                                    },
+                                    text = { Text("Edit Entry") },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Filled.Edit,
+                                            contentDescription = "Edit Icon"
+                                        )
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    onClick = { showDialog.value = true },
+                                    text = { Text("Delete Entry") },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Filled.Delete,
+                                            contentDescription = "Delete Icon"
+                                        )
+                                    }
+                                )
+                            }
+
+                            if (showDialog.value) {
+                                AlertDialog(
+                                    onDismissRequest = { showDialog.value = false },
+                                    title = { Text("Delete Credentials?") },
+                                    text = { Text("This action cannot be undone.") },
+                                    confirmButton = {
+                                        TextButton(
+                                            onClick = {
+                                                onDeleteEntry(entry) // Delete the entry
+                                                showDialog.value = false
+                                                menuExpanded.value = false
+                                                onBack() // Navigate back after deletion
+                                            }
+                                        ) {
+                                            Text("Delete", color = Color(0xFFDC362E))
+                                        }
+                                    },
+                                    dismissButton = {
+                                        TextButton(
+                                            onClick = {
+                                                showDialog.value = false
+                                                menuExpanded.value = false
+                                            }
+                                        ) {
+                                            Text("Cancel", color = colorScheme.primary)
+                                        }
+                                    }
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+
+
+                    ListItem(
+                        headlineText = { Text("URL") },
+                        supportingText = { Text(entry.entryUrl) },
+                        leadingContent = {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.link),
+                                contentDescription = "URL Icon"
+                            )
+                        },
+                    )
+
+                    Divider()
+
+                    ListItem(
+                        headlineText = { Text("Email") },
+                        supportingText = { Text(entry.entryUsername) },
+                        leadingContent = {
+                            Icon(
+                                Icons.Outlined.Email,
+                                contentDescription = "Email Icon"
+                            )
+                        },
+                    )
+
+                    Divider()
+
+                    ListItem(
+                        headlineText = { Text("Password") },
+                        supportingText = { Text(if (passwordVisibility.value) entry.entryPassword else "••••••••") },
+                        leadingContent = {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.key),
+                                contentDescription = "Key Icon"
+                            )
+                        },
+                        trailingContent = {
+                            IconButton(onClick = {
+                                passwordVisibility.value = !passwordVisibility.value
+                            }) {
+                                Icon(
+                                    imageVector = if (passwordVisibility.value) ImageVector.vectorResource(
+                                        id = R.drawable.visibility_on
+                                    ) else ImageVector.vectorResource(id = R.drawable.visibility_off),
+                                    contentDescription = if (passwordVisibility.value) "Hide password" else "Show password"
+                                )
+                            }
+                        }
+                    )
+
+                    Divider()
+                }
+
+                Column(
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    SnackbarHost(
+                        hostState = snackbarHostState
+                    )
+                    OutlinedButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                val clipboard =
+                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clip = ClipData.newPlainText("password", entry.entryPassword)
+                                clipboard.setPrimaryClip(clip)
+
+                                snackbarHostState.showSnackbar("Password copied")
+                            }
+                        },
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = colorScheme.primary
+                        ),
+                        modifier = Modifier.fillMaxWidth(0.9f)
+                    ) {
+                        Text("Copy Password")
+                    }
                 }
             }
-        }} else {
-        // Show progress indicator while loading
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
+        } else {
+            // Show progress indicator while loading
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
         }
     }
 }
