@@ -78,7 +78,7 @@ fun AddEntryView(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth(),
-                        verticalArrangement = Arrangement.Top
+                    verticalArrangement = Arrangement.Top
 
                 ){
                     TopAppBar(
@@ -94,12 +94,12 @@ fun AddEntryView(
             Column(
                 modifier = Modifier
                     .padding(16.dp)
-                    .padding(top = 40.dp)
+                    .padding(top = 50.dp)
                     .padding(bottom = 50.dp)
                     .verticalScroll(rememberScrollState()),
             ) {
 
-                Spacer(modifier = Modifier.height(32.dp))
+//                Spacer(modifier = Modifier.height(32.dp))
 
 
 
