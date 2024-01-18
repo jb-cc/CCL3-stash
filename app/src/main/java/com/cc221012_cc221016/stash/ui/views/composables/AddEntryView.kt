@@ -23,15 +23,15 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -56,11 +56,11 @@ fun AddEntryView(
     val passwordValue = remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var isNameEmpty by remember { mutableStateOf(false) }
+    var isEmailEmpty by remember { mutableStateOf(false) }
+    var isPasswordEmpty by remember { mutableStateOf(false) }
 
     val colorScheme = colorScheme
-    val nameOutlineColor = remember { mutableStateOf(colorScheme.onSurface) }
-    val emailOutlineColor = remember { mutableStateOf(colorScheme.onSurface) }
-    val passwordOutlineColor = remember { mutableStateOf(colorScheme.onSurface) }
     BackHandler {
         onBack()  // Define what should happen when back is pressed
     }
@@ -94,6 +94,8 @@ fun AddEntryView(
             OutlinedTextField(
                 value = nameValue.value,
                 onValueChange = { nameValue.value = it },
+                isError = isNameEmpty,
+                supportingText = { if (isNameEmpty) Text("Required") },
                 label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -102,9 +104,7 @@ fun AddEntryView(
                         contentDescription = "Star Icon"
                     )
                 },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    unfocusedBorderColor = nameOutlineColor.value
-                )
+
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -128,6 +128,8 @@ fun AddEntryView(
             OutlinedTextField(
                 value = emailValue.value,
                 onValueChange = { emailValue.value = it },
+                isError = isEmailEmpty,
+                supportingText = { if (isEmailEmpty) Text("Required") },
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -136,9 +138,7 @@ fun AddEntryView(
                         contentDescription = "Email Icon"
                     )
                 },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    unfocusedBorderColor = emailOutlineColor.value
-                )
+
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -146,7 +146,8 @@ fun AddEntryView(
             OutlinedTextField(
                 value = passwordValue.value,
                 onValueChange = { passwordValue.value = it },
-                label = { Text("Password") },
+                isError = isPasswordEmpty,
+                supportingText = { if (isPasswordEmpty) Text("Required") }, label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
                 leadingIcon = {
@@ -163,9 +164,7 @@ fun AddEntryView(
                         )
                     }
                 },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    unfocusedBorderColor = passwordOutlineColor.value
-                )
+
             )
         }
 
@@ -183,9 +182,9 @@ fun AddEntryView(
                         scope.launch {
                             snackbarHostState.showSnackbar("Please fill out all mandatory fields.")
                         }
-                        if (nameValue.value.isEmpty()) nameOutlineColor.value = Color.Red
-                        if (emailValue.value.isEmpty()) emailOutlineColor.value = Color.Red
-                        if (passwordValue.value.isEmpty()) passwordOutlineColor.value = Color.Red
+                        isNameEmpty = nameValue.value.isEmpty()
+                        isEmailEmpty = emailValue.value.isEmpty()
+                        isPasswordEmpty = passwordValue.value.isEmpty()
                     } else {
                         scope.launch {
                             try {
