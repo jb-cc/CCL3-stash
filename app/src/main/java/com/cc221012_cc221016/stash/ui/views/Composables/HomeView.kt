@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.Context
 import android.util.Log
-import android.webkit.WebView
+import android.webkit.URLUtil
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,18 +22,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.IconButton
+import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,13 +54,11 @@ import com.cc221012_cc221016.stash.R
 import com.cc221012_cc221016.stash.data.Entries
 import com.cc221012_cc221016.stash.models.MainViewModel
 import kotlinx.coroutines.launch
-import coil.compose.rememberImagePainter
-import android.webkit.URLUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Unit, onAddEntryClick: () -> Unit) {
-    val colorScheme = darkColorScheme()
+    val colorScheme = colorScheme
     val mainViewState by mainViewModel.mainViewState.collectAsState()
     Log.d("HomeView", "Recomposing with entries: ${mainViewState.entries}")
     val context = LocalContext.current
@@ -161,10 +162,9 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
 
                     }
             ExtendedFloatingActionButton(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
                 onClick = {
-                    // Handle the logic to add a new entry
-                    //val newEntry = Entries("Test", "user@example.com", "password", "https://example.com")
-                    //mainViewModel.saveEntry(newEntry)
                     onAddEntryClick()
                 },
                 icon = { Icon(Icons.Outlined.Edit, contentDescription = "Edit") },

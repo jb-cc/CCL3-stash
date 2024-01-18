@@ -15,8 +15,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -42,6 +45,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit) {
+
+
     val passwordVisibility = remember { mutableStateOf(false) }
 
     // Initialize state with actual entry data
@@ -63,161 +68,169 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
     }
 
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .padding(16.dp)
-    ) {
-        Column(
+    MaterialTheme(colorScheme = colorScheme){
+        Box(
             modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .padding(16.dp)
+                .padding(16.dp)
         ) {
-            TopAppBar(
-                title = { Text("Edit Entry") },
-                navigationIcon = {
-                    IconButton(onClick = { onBack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            OutlinedTextField(
-                value = nameValue.value,
-                onValueChange = { newValue ->
-                    nameValue.value = newValue
-                    isNameEmpty = newValue.isEmpty()
-                },
-                supportingText = { if (isNameEmpty) Text("Required") },
-                label = { Text("Name") },
-                isError = nameValue.value.isEmpty(),
-                modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.star),
-                        contentDescription = "Star Icon"
-                    )
-                },
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = urlValue.value,
-                onValueChange = { urlValue.value = it },
-                label = { Text("URL") },
-                modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.link),
-                        contentDescription = "URL Icon"
-                    )
-                },
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = emailValue.value,
-                onValueChange = { newValue ->
-                    emailValue.value = newValue
-                    isEmailEmpty = newValue.isEmpty()
-                },
-                supportingText = { if (isEmailEmpty) Text("Required") },
-                label = { Text("Email") },
-                isError = emailValue.value.isEmpty(),
-                modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Email,
-                        contentDescription = "Email Icon"
-                    )
-                },
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = passwordValue.value,
-                onValueChange = { newValue ->
-                    passwordValue.value = newValue
-                    isPasswordEmpty = newValue.isEmpty()
-                },
-                supportingText = { if (isPasswordEmpty) Text("Required") },
-                label = { Text("Password") },
-                isError = passwordValue.value.isEmpty(),
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
-                leadingIcon = {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.key),
-                        contentDescription = "Key Icon"
-                    )
-                },
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisibility.value = !passwordVisibility.value }) {
-                        Icon(
-                            imageVector = if (passwordVisibility.value) ImageVector.vectorResource(id = R.drawable.visibility_on) else ImageVector.vectorResource(id = R.drawable.visibility_off),
-                            contentDescription = if (passwordVisibility.value) "Hide password" else "Show password"
-                        )
-                    }
-                }
-            )
             Column(
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-                Button(
-                    onClick = {
-                        // Check if any of the fields are empty
-                        if (nameValue.value.isEmpty() || emailValue.value.isEmpty() || passwordValue.value.isEmpty()) {
-                            scope.launch {
-                                snackbarHostState.showSnackbar("Please fill in all mandatory fields")
-                            }
-                            return@Button   // Exit the onClick function
+                TopAppBar(
+                    title = { Text("Edit Entry") },
+                    navigationIcon = {
+                        IconButton(onClick = { onBack() }) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                         }
-                        // Construct updated entry from user input
-                        val updatedEntry = Entries(
-                            entryName = nameValue.value,
-                            entryUsername = emailValue.value,
-                            entryPassword = passwordValue.value,
-                            entryUrl = urlValue.value,
-                            entryID = entry.entryID // Preserve the original ID
-                        )
-                        onSave(updatedEntry) // Save the updated entry
-
                     },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                OutlinedTextField(
+                    value = nameValue.value,
+                    onValueChange = { newValue ->
+                        nameValue.value = newValue
+                        isNameEmpty = newValue.isEmpty()
+                    },
+                    supportingText = { if (isNameEmpty) Text("Required") },
+                    label = { Text("Name") },
+                    isError = nameValue.value.isEmpty(),
+                    modifier = Modifier.fillMaxWidth(),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.star),
+                            contentDescription = "Star Icon"
+                        )
+                    },
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = urlValue.value,
+                    onValueChange = { urlValue.value = it },
+                    label = { Text("URL") },
+                    modifier = Modifier.fillMaxWidth(),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.link),
+                            contentDescription = "URL Icon"
+                        )
+                    },
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = emailValue.value,
+                    onValueChange = { newValue ->
+                        emailValue.value = newValue
+                        isEmailEmpty = newValue.isEmpty()
+                    },
+                    supportingText = { if (isEmailEmpty) Text("Required") },
+                    label = { Text("Email") },
+                    isError = emailValue.value.isEmpty(),
+                    modifier = Modifier.fillMaxWidth(),
+                    leadingIcon = {
+                        Icon(
+                            Icons.Outlined.Email,
+                            contentDescription = "Email Icon"
+                        )
+                    },
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = passwordValue.value,
+                    onValueChange = { newValue ->
+                        passwordValue.value = newValue
+                        isPasswordEmpty = newValue.isEmpty()
+                    },
+                    supportingText = { if (isPasswordEmpty) Text("Required") },
+                    label = { Text("Password") },
+                    isError = passwordValue.value.isEmpty(),
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.key),
+                            contentDescription = "Key Icon"
+                        )
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            passwordVisibility.value = !passwordVisibility.value
+                        }) {
+                            Icon(
+                                imageVector = if (passwordVisibility.value) ImageVector.vectorResource(
+                                    id = R.drawable.visibility_on
+                                ) else ImageVector.vectorResource(id = R.drawable.visibility_off),
+                                contentDescription = if (passwordVisibility.value) "Hide password" else "Show password"
+                            )
+                        }
+                    }
+                )
+                Column(
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
-                    Text("Update Entry")
-                }
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    SnackbarHost(
-                        hostState = snackbarHostState,
-                        modifier = Modifier.align(Alignment.BottomCenter)
-                    )
-                }
+
+                    Button(
+                        onClick = {
+                            // Check if any of the fields are empty
+                            if (nameValue.value.isEmpty() || emailValue.value.isEmpty() || passwordValue.value.isEmpty()) {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("Please fill in all mandatory fields")
+                                }
+                                return@Button   // Exit the onClick function
+                            }
+                            // Construct updated entry from user input
+                            val updatedEntry = Entries(
+                                entryName = nameValue.value,
+                                entryUsername = emailValue.value,
+                                entryPassword = passwordValue.value,
+                                entryUrl = urlValue.value,
+                                entryID = entry.entryID // Preserve the original ID
+                            )
+                            onSave(updatedEntry) // Save the updated entry
+
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colorScheme.primary,
+                            contentColor = colorScheme.onPrimary
+                        ),
+
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    ) {
+                        Text("Update Entry")
+                    }
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        SnackbarHost(
+                            hostState = snackbarHostState,
+                            modifier = Modifier.align(Alignment.BottomCenter)
+                        )
+                    }
 
 
+                }
 
             }
 
+
         }
-
-
-
-
     }
 }
