@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -72,13 +74,12 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
-                .padding(16.dp)
+
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                verticalArrangement = Arrangement.Top
             ) {
                 TopAppBar(
                     title = { Text("Edit Entry") },
@@ -89,8 +90,15 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
+            }
 
-                Spacer(modifier = Modifier.height(32.dp))
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .padding(top = 50.dp)
+                    .padding(bottom = 50.dp)
+                    .verticalScroll(rememberScrollState()),
+            ) {
 
                 OutlinedTextField(
                     value = nameValue.value,
@@ -177,60 +185,49 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
                         }
                     }
                 )
-                Column(
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-
-                    Button(
-                        onClick = {
-                            // Check if any of the fields are empty
-                            if (nameValue.value.isEmpty() || emailValue.value.isEmpty() || passwordValue.value.isEmpty()) {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("Please fill in all mandatory fields")
-                                }
-                                return@Button   // Exit the onClick function
-                            }
-                            // Construct updated entry from user input
-                            val updatedEntry = Entries(
-                                entryName = nameValue.value,
-                                entryUsername = emailValue.value,
-                                entryPassword = passwordValue.value,
-                                entryUrl = urlValue.value,
-                                entryID = entry.entryID // Preserve the original ID
-                            )
-                            onSave(updatedEntry) // Save the updated entry
-
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = colorScheme.primary,
-                            contentColor = colorScheme.onPrimary
-                        ),
-
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp)
-                    ) {
-                        Text("Update Entry")
-                    }
-                    Box(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        SnackbarHost(
-                            hostState = snackbarHostState,
-                            modifier = Modifier.align(Alignment.BottomCenter)
-                        )
-                    }
-
-
-                }
-
             }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .align(Alignment.BottomCenter)
+            )
+            {
+                Spacer(Modifier.weight(1f))
 
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                )
 
+                Button(
+                    onClick = {
+                        // Check if any of the fields are empty
+                        if (nameValue.value.isEmpty() || emailValue.value.isEmpty() || passwordValue.value.isEmpty()) {
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Please fill in all mandatory fields")
+                            }
+                            return@Button   // Exit the onClick function
+                        }
+                        // Construct updated entry from user input
+                        val updatedEntry = Entries(
+                            entryName = nameValue.value,
+                            entryUsername = emailValue.value,
+                            entryPassword = passwordValue.value,
+                            entryUrl = urlValue.value,
+                            entryID = entry.entryID // Preserve the original ID
+                        )
+                        onSave(updatedEntry) // Save the updated entry
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorScheme.primary,
+                        contentColor = colorScheme.onPrimary
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text("Update Entry")
+                }
+            }
         }
     }
 }
