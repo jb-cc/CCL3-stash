@@ -195,6 +195,9 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
                         onSave(updatedEntry) // Save the updated entry
 
                     },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
                 ) {
                     Text("Update Entry")
                 }
