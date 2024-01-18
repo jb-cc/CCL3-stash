@@ -35,8 +35,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -213,7 +211,7 @@ fun EntryInitial(entryName: String) {
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(40.dp)
-            .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
+            .background(colorScheme.primary, shape = CircleShape)
             .padding(end = 8.dp)
     ) {
         Text(
