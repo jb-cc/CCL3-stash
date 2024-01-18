@@ -99,8 +99,6 @@ fun AddEntryView(
                     .verticalScroll(rememberScrollState()),
             ) {
 
-//                Spacer(modifier = Modifier.height(32.dp))
-
 
 
                 OutlinedTextField(
@@ -181,13 +179,12 @@ fun AddEntryView(
                         }
                     },
                 )
-                }
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
                     .align(Alignment.BottomCenter)
-
             ){
                 SnackbarHost(
                     hostState = snackbarHostState,
@@ -230,7 +227,6 @@ fun AddEntryView(
                     Text("Save Entry")
                 }
             }
-
         }
     }
 }
