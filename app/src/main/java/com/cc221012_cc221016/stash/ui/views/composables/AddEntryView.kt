@@ -62,7 +62,7 @@ fun AddEntryView(
 
     val colorScheme = colorScheme
     BackHandler {
-        onBack()  // Define what should happen when back is pressed
+        onBack()
     }
 
     Box(
@@ -179,9 +179,9 @@ fun AddEntryView(
             Button(
                 onClick = {
                     if (nameValue.value.isEmpty() || emailValue.value.isEmpty() || passwordValue.value.isEmpty()) {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("Please fill out all mandatory fields.")
-                        }
+//                        scope.launch {
+//                            snackbarHostState.showSnackbar("Please fill out all mandatory fields.")
+//                        }
                         isNameEmpty = nameValue.value.isEmpty()
                         isEmailEmpty = emailValue.value.isEmpty()
                         isPasswordEmpty = passwordValue.value.isEmpty()
@@ -197,6 +197,7 @@ fun AddEntryView(
                                 val entryId = mainViewModel.saveEntry(newEntry)
                                 val savedEntry = mainViewModel.getEntryById(entryId)
                                 navigateToShowEntry(savedEntry)
+
                             } catch (e: Exception) {
                                 Log.e("AddEntryView", "Error: ${e.message}")
                                 snackbarHostState.showSnackbar("Error saving entry")
