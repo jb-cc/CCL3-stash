@@ -10,11 +10,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.cc221012_cc221016.stash.data.Entries
 import com.cc221012_cc221016.stash.models.MainViewModel
-import com.cc221012_cc221016.stash.ui.views.Composables.AddEntryView
-import com.cc221012_cc221016.stash.ui.views.Composables.EditEntryView
-import com.cc221012_cc221016.stash.ui.views.Composables.HomeView
-import com.cc221012_cc221016.stash.ui.views.Composables.LoginRegisterView
-import com.cc221012_cc221016.stash.ui.views.Composables.ShowEntryView
+import com.cc221012_cc221016.stash.ui.views.composables.AddEntryView
+import com.cc221012_cc221016.stash.ui.views.composables.EditEntryView
+import com.cc221012_cc221016.stash.ui.views.composables.HomeView
+import com.cc221012_cc221016.stash.ui.views.composables.LoginRegisterView
+import com.cc221012_cc221016.stash.ui.views.composables.ShowEntryView
 
 sealed class Screen(val route: String){
     object First: Screen("first")
