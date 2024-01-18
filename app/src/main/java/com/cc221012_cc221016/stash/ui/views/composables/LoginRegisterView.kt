@@ -68,6 +68,7 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
+    var isPasswordInvalid by remember { mutableStateOf(false) }
 
 
     Box(contentAlignment = Alignment.Center) {
@@ -121,10 +122,6 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                                     }
                                 }),
                                 isError = isPasswordIncorrect,
-                                colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    focusedBorderColor = if (isPasswordIncorrect) Color.Red else MaterialTheme.colorScheme.primary,
-                                    unfocusedBorderColor = if (isPasswordIncorrect) Color.Red else MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.disabled)
-                                ),
                                 supportingText = { if (isPasswordIncorrect) Text(text = "Incorrect Password") },
                             )
                         }
@@ -172,13 +169,29 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                             .onFocusChanged { focusState ->
                                 newPWisFocused = focusState.isFocused
                             },
-                        supportingText = { if(newPWisFocused)PasswordRequirements(masterPassword.text) }
+                        isError = if(newPWisFocused || isPasswordInvalid) {
+                            !isPasswordValid(masterPassword.text)
+                        } else {
+                            false
+                        },
+                        supportingText = {
+                            if(newPWisFocused)PasswordRequirements(masterPassword.text) else {
+                                if (isPasswordInvalid) {
+                                    when {
+                                        masterPassword.text.isEmpty() -> Text(text = "Please enter a password")
+                                        !isPasswordValid(masterPassword.text) -> Text(text = "Password does not meet the requirements")
+                                    }
+                                }
+                            }
+                        }
+
                     )
 
                     OutlinedTextField(
                         value = repeatMasterPassword,
                         onValueChange = { newRepeatMasterPassword -> if (newRepeatMasterPassword.text.length <= 50) repeatMasterPassword = newRepeatMasterPassword },
                         label = { Text(text = "Repeat Master Password") },
+
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = {
@@ -187,14 +200,14 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                                     val newUser = Users(masterPassword.text)
                                     viewModel.saveUser(newUser)
                                 } else {
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar("Passwords do not match")
-                                    }
+//                                    coroutineScope.launch {
+//                                        snackbarHostState.showSnackbar("Passwords do not match")
+//                                    }
                                 }
                             } else {
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("Password does not meet the requirements")
-                                }
+//                                coroutineScope.launch {
+//                                    snackbarHostState.showSnackbar("Password does not meet the requirements")
+//                                }
                             }
                         }),
                         modifier = Modifier
@@ -203,12 +216,12 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                             .onFocusChanged { focusState ->
                                 repeatPWisFocused = focusState.isFocused
                             },
-                        isError = if(repeatPWisFocused) {
+                        isError = if(repeatPWisFocused || isPasswordInvalid) {
                             !isPasswordValid(repeatMasterPassword.text)
                         } else {
                             false
                         },
-                        supportingText = {if (repeatPWisFocused){
+                        supportingText = {if (repeatPWisFocused || isPasswordInvalid){
                             when {
                                 repeatMasterPassword.text.isEmpty() -> Text(text = "Please repeat password")
                                 masterPassword.text != repeatMasterPassword.text -> Text(text = "Passwords do not match")
@@ -228,6 +241,8 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                             Button(
                                 onClick = {
                                     if (isPasswordValid(masterPassword.text)) {
+
+
                                         if (masterPassword.text == repeatMasterPassword.text) {
                                             val newUser = Users(masterPassword.text)
                                             viewModel.saveUser(newUser)
@@ -237,9 +252,10 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                                             }
                                         }
                                     } else {
-                                        coroutineScope.launch {
-                                            snackbarHostState.showSnackbar("Password does not meet the requirements")
-                                        }
+                                        isPasswordInvalid = true
+//                                        coroutineScope.launch {
+//                                            snackbarHostState.showSnackbar("Password does not meet the requirements")
+//                                        }
                                     }
                                 },
                                 modifier = Modifier
@@ -250,12 +266,12 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                             }
 
                         }
-                        SnackbarHost(
-                            hostState = snackbarHostState,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.BottomCenter)
-                        )
+//                        SnackbarHost(
+//                            hostState = snackbarHostState,
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .align(Alignment.BottomCenter)
+//                        )
                     }
                 }
             }
