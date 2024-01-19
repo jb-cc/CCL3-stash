@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -28,7 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -240,7 +240,7 @@ fun ShowEntryView(
                     SnackbarHost(
                         hostState = snackbarHostState
                     )
-                    OutlinedButton(
+                    Button(
                         onClick = {
                             coroutineScope.launch {
                                 val clipboard =
@@ -251,8 +251,9 @@ fun ShowEntryView(
                                 snackbarHostState.showSnackbar("Password copied")
                             }
                         },
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = colorScheme.primary
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colorScheme.primary,
+                            contentColor = colorScheme.onPrimary
                         ),
                         modifier = Modifier.fillMaxWidth(1f)
                     ) {
