@@ -52,6 +52,15 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
         _selectedEntry.value = entry
     }
 
+    fun logOut() {
+        viewModelScope.launch {
+            // Update the state to reflect that the user is not authenticated
+            _mainViewState.update { currentState ->
+                currentState.copy(isUserAuthenticated = false)
+            }
+            // Perform any additional cleanup or state updates necessary for logging out
+        }
+    }
 
     //ENTRIES METHODS
 

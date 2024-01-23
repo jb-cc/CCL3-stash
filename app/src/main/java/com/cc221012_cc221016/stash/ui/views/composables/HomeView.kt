@@ -101,7 +101,7 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                     NavigationDrawerItem(
                         label = { Text(text = "Log out") },
                         selected = false,
-                        onClick = { mainViewState.isUserAuthenticated = false }
+                        onClick = { mainViewModel.logOut()}
                     )
                 }
                 }
