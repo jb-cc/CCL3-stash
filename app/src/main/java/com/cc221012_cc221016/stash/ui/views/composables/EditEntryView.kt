@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,10 +53,10 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
     val passwordVisibility = remember { mutableStateOf(false) }
 
     // Initialize state with actual entry data
-    val nameValue = remember { mutableStateOf(entry.entryName) }
-    val urlValue = remember { mutableStateOf(entry.entryUrl) }
-    val emailValue = remember { mutableStateOf(entry.entryUsername) }
-    val passwordValue = remember { mutableStateOf(entry.entryPassword) }
+    val nameValue = rememberSaveable { mutableStateOf(entry.entryName) }
+    val urlValue = rememberSaveable { mutableStateOf(entry.entryUrl) }
+    val emailValue = rememberSaveable { mutableStateOf(entry.entryUsername) }
+    val passwordValue = rememberSaveable { mutableStateOf(entry.entryPassword) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 

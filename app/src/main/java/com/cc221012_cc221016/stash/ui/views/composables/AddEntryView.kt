@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,11 +53,11 @@ fun AddEntryView(
     onBack: () -> Unit,
     navigateToShowEntry: (Entries) -> Unit
 ) {
-    val passwordVisibility = remember { mutableStateOf(false) }
-    val nameValue = remember { mutableStateOf("") }
-    val urlValue = remember { mutableStateOf("") }
-    val emailValue = remember { mutableStateOf("") }
-    val passwordValue = remember { mutableStateOf("") }
+    val passwordVisibility = rememberSaveable { mutableStateOf(false) }
+    val nameValue = rememberSaveable { mutableStateOf("") }
+    val urlValue = rememberSaveable { mutableStateOf("") }
+    val emailValue = rememberSaveable { mutableStateOf("") }
+    val passwordValue = rememberSaveable { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var isNameEmpty by remember { mutableStateOf(false) }
@@ -208,7 +209,7 @@ fun AddEntryView(
                                         entryUrl = urlValue.value
                                     )
                                     val entryId = mainViewModel.saveEntry(newEntry)
-                                    val savedEntry = mainViewModel.getEntryById(entryId)
+                                    val savedEntry = mainViewModel.getEntryById(entryId.toInt())
                                     navigateToShowEntry(savedEntry)
 
                                 } catch (e: Exception) {

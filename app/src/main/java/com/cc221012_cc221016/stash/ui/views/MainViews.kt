@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,54 +29,55 @@ fun MainView(mainViewModel: MainViewModel) {
     Log.d("MainView", "MainView: $mainViewState")
     Log.d("MainView", "Got Users: $users")
 
-    var currentScreen by remember { mutableStateOf("Home") }
-    var selectedEntry by remember { mutableStateOf<Entries?>(null) } // State to hold the selected entry
+    val currentScreen by mainViewModel.currentScreen.observeAsState("Home")
+    val selectedEntry by mainViewModel.selectedEntry.observeAsState()
 
     if (mainViewState.isUserAuthenticated) {
         when (currentScreen) {
             "Home" -> HomeView(
-                mainViewModel,
+                mainViewModel = mainViewModel,
                 navigateToShowEntry = { entry ->
-                    selectedEntry = entry
-                    currentScreen = "ShowEntry"
+                    mainViewModel.setSelectedEntry(entry)
+                    mainViewModel.setCurrentScreen("ShowEntry")
                 },
                 onAddEntryClick = {
-                    currentScreen = "AddEntry"
+                    mainViewModel.setCurrentScreen("AddEntry")
                 }
             )
             "ShowEntry" -> selectedEntry?.let { entry ->
                 ShowEntryView(
-                    entryId = entry.entryID.toLong(),
-                    onBack = {
-                        currentScreen = "Home"
-                    },
+                    entryId = entry.entryID,
+                    onBack = { mainViewModel.setCurrentScreen("Home") },
                     onDeleteEntry = { entryToDelete ->
                         mainViewModel.deleteEntry(entryToDelete)
-                        currentScreen = "Home"
+                        mainViewModel.setCurrentScreen("Home")
                     },
                     onEditEntry = { entryToEdit ->
-                        selectedEntry = entryToEdit
-                        currentScreen = "EditEntry"
+                        mainViewModel.setSelectedEntry(entryToEdit)
+                        mainViewModel.setCurrentScreen("EditEntry")
                     },
-                    mainViewModel = mainViewModel // Add this line
+                    mainViewModel = mainViewModel
                 )
             }
-
-            "AddEntry" -> AddEntryView(mainViewModel, onBack = {
-                currentScreen = "Home"
-            }, navigateToShowEntry = { entry ->
-                selectedEntry = entry
-                currentScreen = "ShowEntry"
-            })
+            "AddEntry" -> AddEntryView(
+                mainViewModel = mainViewModel,
+                onBack = { mainViewModel.setCurrentScreen("Home") },
+                navigateToShowEntry = { entry ->
+                    mainViewModel.setSelectedEntry(entry)
+                    mainViewModel.setCurrentScreen("ShowEntry")
+                }
+            )
             "EditEntry" -> selectedEntry?.let { entry ->
-            EditEntryView(entry, onBack = {
-                currentScreen = "ShowEntry"
-            }, onSave = { updatedEntry ->
-                mainViewModel.updateEntry(updatedEntry)
-                selectedEntry = updatedEntry // Update the selected entry
-                currentScreen = "ShowEntry"
-            })
-        }
+                EditEntryView(
+                    entry = entry,
+                    onBack = { mainViewModel.setCurrentScreen("ShowEntry") },
+                    onSave = { updatedEntry ->
+                        mainViewModel.updateEntry(updatedEntry)
+                        mainViewModel.setSelectedEntry(updatedEntry)
+                        mainViewModel.setCurrentScreen("ShowEntry")
+                    }
+                )
+            }
         }
     } else {
         if (users.isNotEmpty()) {

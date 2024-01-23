@@ -56,7 +56,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowEntryView(
-    entryId: Long,
+    entryId: Int,
     onBack: () -> Unit,
     mainViewModel: MainViewModel,
     onEditEntry: (Entries) -> Unit,

@@ -1,6 +1,8 @@
 package com.cc221012_cc221016.stash.models
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cc221012_cc221016.stash.data.Entries
@@ -35,8 +37,20 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
     private val _mainViewState = MutableStateFlow(MainViewState())
     val mainViewState: StateFlow<MainViewState> = _mainViewState.asStateFlow()
 
-    private val _selectedEntry = MutableStateFlow<Entries?>(null)
-    val selectedEntry: StateFlow<Entries?> = _selectedEntry.asStateFlow()
+    private val _selectedEntry = MutableLiveData<Entries?>(null)
+    val selectedEntry: LiveData<Entries?> = _selectedEntry
+
+    private val _currentScreen = MutableLiveData<String>("Home")
+    val currentScreen: LiveData<String> = _currentScreen
+
+
+    fun setCurrentScreen(screen: String) {
+        _currentScreen.value = screen
+    }
+
+    fun setSelectedEntry(entry: Entries?) {
+        _selectedEntry.value = entry
+    }
 
 
     //ENTRIES METHODS
@@ -58,8 +72,8 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
         return id // Return the generated ID
     }
 
-    suspend fun getEntryById(id: Long): Entries {
-        return entriesDao.getEntry(id).first()
+    suspend fun getEntryById(id: Int): Entries {
+        return entriesDao.getEntry(id.toLong()).first()
     }
 
     fun fetchEntryById(id: Long) {
