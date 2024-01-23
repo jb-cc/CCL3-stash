@@ -24,17 +24,25 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.IconButton
 import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -63,114 +71,175 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
 
     MaterialTheme(colorScheme = colorScheme) {
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                ModalDrawerSheet {
+
+
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Stash",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                    Divider()
+                    Spacer(modifier = Modifier.weight(1f))
+                    NavigationDrawerItem(
+                        label = { Text(text = "Log out") },
+                        selected = false,
+                        onClick = { mainViewState.isUserAuthenticated = false }
+                    )
+                }
+                }
+            },
+            gesturesEnabled = true,
         ) {
 
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Top
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
             ) {
-                TopAppBar(
-                    title = {
-                        Row(Modifier.fillMaxWidth()) {
-                            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                                Text("Your Stash")
+
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    CenterAlignedTopAppBar(
+                        title = {
+                            Row(Modifier.fillMaxWidth()) {
+                                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                                    Text("Your Stash")
+                                }
+                            }
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
+                                }
+                            }) {
+                                Icon(Icons.Default.Menu, contentDescription = "Menu")
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .padding(top = 50.dp)
+                ) {
+
+
+                    // Ensure LazyColumn is not in an unbounded vertically expandable container
+                    if (mainViewState.entries.isEmpty()) {
+                        Text(
+                            "No entries yet", style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    } else {
+                        LazyColumn {
+                            items(mainViewState.entries) { entry ->
+                                OutlinedCard(
+                                    onClick = { navigateToShowEntry(entry) },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 16.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(16.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        // Load and display the favicon or the initial letter
+                                        if (isValidUrl(entry.entryUrl)) {
+                                            val faviconUrl = getFaviconUrl(entry.entryUrl)
+                                            Log.d(
+                                                "HomeView",
+                                                "Loading favicon for URL: $faviconUrl"
+                                            )
+                                            Image(
+                                                painter = rememberAsyncImagePainter(faviconUrl),
+                                                contentDescription = "Favicon",
+                                                modifier = Modifier.size(40.dp)
+                                            )
+                                        } else {
+                                            Log.d(
+                                                "HomeView",
+                                                "Invalid URL, showing initial: ${entry.entryName}"
+                                            )
+                                            EntryInitial(entryName = entry.entryName)
+                                        }
+                                        Spacer(modifier = Modifier.width(16.dp)) // Add spacing here
+
+                                        Column(
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text(
+                                                text = entry.entryName,
+                                                style = MaterialTheme.typography.titleMedium,
+                                                modifier = Modifier.padding(bottom = 8.dp)
+                                            )
+                                            Text(
+                                                text = entry.entryUsername,
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            // You can add more fields here as needed
+                                        }
+                                        IconButton(onClick = {
+                                            val clip = ClipData.newPlainText(
+                                                "password",
+                                                entry.entryPassword
+                                            )
+                                            clipboardManager.setPrimaryClip(clip)
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar("Password copied to clipboard")
+                                            }
+                                        }) {
+                                            Icon(
+                                                imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
+                                                contentDescription = "Copy Icon"
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            item {
+                                Spacer(modifier = Modifier.height(60.dp))
                             }
                         }
+                    }
+
+                }
+                ExtendedFloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
+                    onClick = {
+                        onAddEntryClick()
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    icon = { Icon(Icons.Outlined.Edit, contentDescription = "Edit") },
+                    text = { Text("Add entry") },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
                 )
             }
-            Column(modifier = Modifier
-                .padding(16.dp)
-                .padding(top = 50.dp)) {
-
-
-                // Ensure LazyColumn is not in an unbounded vertically expandable container
-                if (mainViewState.entries.isEmpty()) {
-                    Text("No entries yet", style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.align(Alignment.CenterHorizontally))
-                } else {
-                    LazyColumn {
-                        items(mainViewState.entries) { entry ->
-                            OutlinedCard(
-                                onClick = { navigateToShowEntry(entry)  },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 16.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    // Load and display the favicon or the initial letter
-                                    if (isValidUrl(entry.entryUrl)) {
-                                        val faviconUrl = getFaviconUrl(entry.entryUrl )
-                                        Log.d("HomeView", "Loading favicon for URL: $faviconUrl")
-                                        Image(
-                                            painter = rememberAsyncImagePainter(faviconUrl),
-                                            contentDescription = "Favicon",
-                                            modifier = Modifier.size(40.dp)
-                                        )
-                                    } else {
-                                        Log.d("HomeView", "Invalid URL, showing initial: ${entry.entryName}")
-                                        EntryInitial(entryName = entry.entryName)
-                                    }
-                                            Spacer(modifier = Modifier.width(16.dp)) // Add spacing here
-
-                                            Column(
-                                                modifier = Modifier.weight(1f)
-                                            ) {
-                                                Text(
-                                                    text = entry.entryName,
-                                                    style = MaterialTheme.typography.titleMedium,
-                                                    modifier = Modifier.padding(bottom = 8.dp)
-                                                )
-                                                Text(
-                                                    text = entry.entryUsername,
-                                                    style = MaterialTheme.typography.bodyMedium
-                                                )
-                                                // You can add more fields here as needed
-                                            }
-                                    IconButton(onClick = {
-                                        val clip = ClipData.newPlainText("password", entry.entryPassword)
-                                        clipboardManager.setPrimaryClip(clip)
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar("Password copied to clipboard")
-                                        }
-                                    }) {
-                                        Icon(
-                                            imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
-                                            contentDescription = "Copy Icon"
-                                        )
-                                    }
-                                        }
-                                    }
-                                }
-                                item {
-                                    Spacer(modifier = Modifier.height(60.dp))
-                                }
-                            }
-                        }
-
-                    }
-            ExtendedFloatingActionButton(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
-                onClick = {
-                    onAddEntryClick()
-                },
-                icon = { Icon(Icons.Outlined.Edit, contentDescription = "Edit") },
-                text = { Text("Add entry") },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-            )
         }
     }
     Box(
