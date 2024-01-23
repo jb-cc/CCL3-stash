@@ -215,7 +215,7 @@ fun EntryInitial(entryName: String) {
             .padding(end = 8.dp)
     ) {
         Text(
-            text = "  " + entryName.take(1).uppercase(),
+            text = "  " + entryName.take(1).uppercase() + " ",
             style = MaterialTheme.typography.titleMedium,
             color = Color.White
         )
