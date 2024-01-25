@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -50,9 +49,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
@@ -154,10 +153,29 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
 
                     // Ensure LazyColumn is not in an unbounded vertically expandable container
                     if (mainViewState.entries.isEmpty()) {
-                        Text(
-                            "No entries yet", style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.passkey),
+                                contentDescription = "Desired Icon",
+                                modifier = Modifier.size(160.dp),
+                                colorScheme.outline
+                            )
+                            Text(
+                                "Nothing here yet...",
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.align(Alignment.TopCenter).padding(top = 160.dp),
+                                color = colorScheme.outline
+                            )
+                            Text(
+                                "Add an entry to get started",
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.align(Alignment.TopCenter).padding(top = 200.dp),
+                                color = colorScheme.outline
+                            )
+                        }
                     } else {
                         LazyColumn {
                             items(mainViewState.entries) { entry ->
