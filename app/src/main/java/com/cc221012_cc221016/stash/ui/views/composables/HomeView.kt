@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -79,33 +80,33 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
             drawerState = drawerState,
             drawerContent = {
                 ModalDrawerSheet {
-
-
                     Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(vertical = 16.dp),
+                        verticalArrangement = Arrangement.Top // Align items to the top
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Stash",
-                                style = MaterialTheme.typography.titleSmall,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
+                        Text(
+                            text = "Stash",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(16.dp)
+                        )
                         Divider()
-                        Spacer(modifier = Modifier.weight(1f))
+
+                        // "Log Out" button with icon
                         NavigationDrawerItem(
                             label = { Text(text = "Log out") },
+                            icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Log Out") },
                             selected = false,
-                            onClick = { mainViewModel.logOut()}
+                            onClick = { mainViewModel.logOut() },
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
                 }
             },
-            gesturesEnabled = true,
+            gesturesEnabled = true
         ) {
 
 
