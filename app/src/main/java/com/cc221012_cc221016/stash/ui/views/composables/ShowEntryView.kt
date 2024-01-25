@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,8 +19,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
@@ -74,6 +73,7 @@ fun ShowEntryView(
     val menuExpanded = remember { mutableStateOf(false) }
     val showDialog = remember { mutableStateOf(false) }
     val entryState = remember { mutableStateOf<Entries?>(null) }
+    val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
     LaunchedEffect(entryId) {
         entryState.value = mainViewModel.getEntryById(entryId)
@@ -189,6 +189,20 @@ fun ShowEntryView(
                                 contentDescription = "URL Icon"
                             )
                         },
+                        trailingContent = {
+                            IconButton(onClick = {
+                                val clip = ClipData.newPlainText("URL", entry.entryUrl)
+                                clipboardManager.setPrimaryClip(clip)
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("URL copied")
+                                }
+                            }) {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
+                                    contentDescription = "Copy Icon"
+                                )
+                            }
+                        }
                     )
 
                     Divider()
@@ -202,6 +216,20 @@ fun ShowEntryView(
                                 contentDescription = "Email Icon"
                             )
                         },
+                        trailingContent = {
+                            IconButton(onClick = {
+                                val clip = ClipData.newPlainText("Email", entry.entryUsername)
+                                clipboardManager.setPrimaryClip(clip)
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("Email copied")
+                                }
+                            }) {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
+                                    contentDescription = "Copy Icon"
+                                )
+                            }
+                        }
                     )
 
                     Divider()
@@ -216,15 +244,29 @@ fun ShowEntryView(
                             )
                         },
                         trailingContent = {
-                            IconButton(onClick = {
-                                passwordVisibility.value = !passwordVisibility.value
-                            }) {
-                                Icon(
-                                    imageVector = if (passwordVisibility.value) ImageVector.vectorResource(
-                                        id = R.drawable.visibility_on
-                                    ) else ImageVector.vectorResource(id = R.drawable.visibility_off),
-                                    contentDescription = if (passwordVisibility.value) "Hide password" else "Show password"
-                                )
+                            Row {
+                                IconButton(onClick = {
+                                    passwordVisibility.value = !passwordVisibility.value
+                                }) {
+                                    Icon(
+                                        imageVector = if (passwordVisibility.value) ImageVector.vectorResource(
+                                            id = R.drawable.visibility_on
+                                        ) else ImageVector.vectorResource(id = R.drawable.visibility_off),
+                                        contentDescription = if (passwordVisibility.value) "Hide password" else "Show password"
+                                    )
+                                }
+                                IconButton(onClick = {
+                                    val clip = ClipData.newPlainText("Password", entry.entryPassword)
+                                    clipboardManager.setPrimaryClip(clip)
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Password copied")
+                                    }
+                                }) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
+                                        contentDescription = "Copy Icon"
+                                    )
+                                }
                             }
                         }
                     )
@@ -240,25 +282,6 @@ fun ShowEntryView(
                     SnackbarHost(
                         hostState = snackbarHostState
                     )
-                    Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                val clipboard =
-                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                val clip = ClipData.newPlainText("password", entry.entryPassword)
-                                clipboard.setPrimaryClip(clip)
-
-                                snackbarHostState.showSnackbar("Password copied")
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = colorScheme.primary,
-                            contentColor = colorScheme.onPrimary
-                        ),
-                        modifier = Modifier.fillMaxWidth(1f)
-                    ) {
-                        Text("Copy Password")
-                    }
                 }
             }
         } else {
