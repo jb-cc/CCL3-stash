@@ -278,7 +278,7 @@ fun EntryInitial(entryName: String) {
         Text(
             text = "   " + entryName.take(1).uppercase() + " ",
             style = MaterialTheme.typography.titleMedium,
-            color = Color.White
+            color = colorScheme.onPrimary
         )
     }
 }
