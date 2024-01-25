@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -84,8 +85,9 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(vertical = 16.dp),
-                        verticalArrangement = Arrangement.SpaceBetween // Align items to the top
+                        verticalArrangement = Arrangement.Top // Align top part to the top
                     ) {
+                        // Top part with title
                         Text(
                             text = "Stash",
                             style = MaterialTheme.typography.titleMedium,
@@ -95,7 +97,10 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                         )
                         Divider()
 
-                        // "Log Out" button with icon
+                        // Spacer to push the "Log out" button to the bottom
+                        Spacer(modifier = Modifier.weight(1f, fill = true))
+
+                        // "Log Out" button at the bottom
                         NavigationDrawerItem(
                             label = { Text(text = "Log out") },
                             icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Log Out") },
@@ -107,7 +112,8 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                 }
             },
             gesturesEnabled = true
-        ) {
+        )
+        {
 
 
             Box(
