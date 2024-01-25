@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
@@ -38,11 +39,14 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.cc221012_cc221016.stash.R
 import com.cc221012_cc221016.stash.data.Users
@@ -90,6 +94,7 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
             Column(modifier = Modifier.weight(1f)) {
                 if (user != null) {
                     var isPasswordIncorrect by remember { mutableStateOf(false) }
+                    var passwordVisibility by remember { mutableStateOf(false) }
 
                     Box(modifier = Modifier.fillMaxSize()) {
                         Column(
@@ -102,13 +107,14 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
 
                             OutlinedTextField(
                                 value = password,
+                                singleLine = true,
                                 onValueChange = { newPassword ->
                                     if (newPassword.text.length <= 50) {
                                         password = newPassword
                                     }
                                 },
                                 label = { Text(text = "Master Password") },
-                                visualTransformation = PasswordVisualTransformation(),
+                                visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                                 keyboardActions = KeyboardActions(onDone = {
                                     isPasswordIncorrect = if (password.text == user.userPassword) {
@@ -120,6 +126,17 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                                 }),
                                 isError = isPasswordIncorrect,
                                 supportingText = { if (isPasswordIncorrect) Text(text = "Incorrect Password") },
+                                trailingIcon = {
+                                    IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                                        Icon(
+                                            imageVector = if (passwordVisibility) ImageVector.vectorResource(
+                                                id = R.drawable.visibility_on
+                                            ) else ImageVector.vectorResource(id = R.drawable.visibility_off),
+                                            contentDescription = if (passwordVisibility) "Hide password" else "Show password",
+                                            tint = MaterialTheme.colorScheme.onSurface // Set the color of the icon
+                                        )
+                                    }
+                                }
                             )
                         }
 
@@ -153,11 +170,15 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                 } else {
                     var newPWisFocused by remember { mutableStateOf(false) }
                     var repeatPWisFocused by remember { mutableStateOf(false) }
+                    var masterPasswordVisibility by remember { mutableStateOf(false) }
+                    var repeatMasterPasswordVisibility by remember { mutableStateOf(false) }
+
                     OutlinedTextField(
                         value = masterPassword,
+                        singleLine = true,
                         onValueChange = { newMasterPassword -> if (newMasterPassword.text.length <= 50) masterPassword = newMasterPassword },
                         label = { Text(text = "New Master Password") },
-                        visualTransformation = PasswordVisualTransformation(),
+                        visualTransformation = if (masterPasswordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
                         keyboardActions = KeyboardActions(onNext = { focusRequester.requestFocus() }),
                         modifier = Modifier
@@ -166,6 +187,20 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                             .onFocusChanged { focusState ->
                                 newPWisFocused = focusState.isFocused
                             },
+                        trailingIcon = {
+                            IconButton(onClick = { masterPasswordVisibility = !masterPasswordVisibility }) {
+                                Icon(
+                                    imageVector = if (masterPasswordVisibility) ImageVector.vectorResource(
+                                        id = R.drawable.visibility_on) else ImageVector.vectorResource(
+                                        id = R.drawable.visibility_off),
+                                    contentDescription = if (masterPasswordVisibility) "Hide password" else "Show password",
+                                    tint = MaterialTheme.colorScheme.onSurface // Set the color of the icon
+
+                                )
+                            }
+                        },
+
+
                         isError = if(newPWisFocused || isPasswordInvalid) {
                             !isPasswordValid(masterPassword.text)
                         } else {
@@ -184,12 +219,14 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
 
                     )
 
+
                     OutlinedTextField(
                         value = repeatMasterPassword,
+                        singleLine = true,
                         onValueChange = { newRepeatMasterPassword -> if (newRepeatMasterPassword.text.length <= 50) repeatMasterPassword = newRepeatMasterPassword },
                         label = { Text(text = "Repeat Master Password") },
 
-                        visualTransformation = PasswordVisualTransformation(),
+                        visualTransformation = if (repeatMasterPasswordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = {
                             if (isPasswordValid(masterPassword.text)) {
@@ -207,6 +244,17 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
 //                                }
                             }
                         }),
+                        trailingIcon = {
+                            IconButton(onClick = { repeatMasterPasswordVisibility = !repeatMasterPasswordVisibility }) {
+                                Icon(
+                                    imageVector = if (repeatMasterPasswordVisibility)ImageVector.vectorResource(
+                                        id = R.drawable.visibility_on
+                                    ) else ImageVector.vectorResource(id = R.drawable.visibility_off),
+                                    contentDescription = if (repeatMasterPasswordVisibility) "Hide password" else "Show password",
+                                    tint = MaterialTheme.colorScheme.onSurface // Set the color of the icon
+                                )
+                            }
+                        },
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .focusRequester(focusRequester)
