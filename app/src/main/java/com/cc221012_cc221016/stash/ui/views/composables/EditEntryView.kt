@@ -1,6 +1,7 @@
 package com.cc221012_cc221016.stash.ui.views.composables
 
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,8 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -37,13 +36,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.cc221012_cc221016.stash.R
 import com.cc221012_cc221016.stash.data.Entries
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,9 +56,7 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
     val urlValue = rememberSaveable { mutableStateOf(entry.entryUrl) }
     val emailValue = rememberSaveable { mutableStateOf(entry.entryUsername) }
     val passwordValue = rememberSaveable { mutableStateOf(entry.entryPassword) }
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-
+    val context = LocalContext.current
     var isNameEmpty by remember { mutableStateOf(false) }
     var isEmailEmpty by remember { mutableStateOf(false) }
     var isPasswordEmpty by remember { mutableStateOf(false) }
@@ -196,17 +193,13 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
             {
                 Spacer(Modifier.weight(1f))
 
-                SnackbarHost(
-                    hostState = snackbarHostState,
-                )
+
 
                 Button(
                     onClick = {
                         // Check if any of the fields are empty
                         if (nameValue.value.isEmpty() || emailValue.value.isEmpty() || passwordValue.value.isEmpty()) {
-                            scope.launch {
-                                snackbarHostState.showSnackbar("Please fill in all mandatory fields")
-                            }
+                            Toast.makeText(context, "Please fill in all mandatory fields", Toast.LENGTH_LONG).show()
                             return@Button   // Exit the onClick function
                         }
                         // Construct updated entry from user input
