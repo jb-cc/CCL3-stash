@@ -82,28 +82,28 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                 ModalDrawerSheet {
 
 
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(
-                            text = "Stash",
-                            style = MaterialTheme.typography.titleSmall,
-                            modifier = Modifier.padding(16.dp)
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Stash",
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                        Divider()
+                        Spacer(modifier = Modifier.weight(1f))
+                        NavigationDrawerItem(
+                            label = { Text(text = "Log out") },
+                            selected = false,
+                            onClick = { mainViewModel.logOut()}
                         )
                     }
-                    Divider()
-                    Spacer(modifier = Modifier.weight(1f))
-                    NavigationDrawerItem(
-                        label = { Text(text = "Log out") },
-                        selected = false,
-                        onClick = { mainViewModel.logOut()}
-                    )
-                }
                 }
             },
             gesturesEnabled = true,

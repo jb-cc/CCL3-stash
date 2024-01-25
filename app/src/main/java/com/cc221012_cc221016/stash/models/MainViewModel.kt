@@ -37,20 +37,11 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
     private val _mainViewState = MutableStateFlow(MainViewState())
     val mainViewState: StateFlow<MainViewState> = _mainViewState.asStateFlow()
 
-    private val _selectedEntry = MutableLiveData<Entries?>(null)
-    val selectedEntry: LiveData<Entries?> = _selectedEntry
+    private val _selectedEntry = MutableStateFlow<Entries?>(null)
+    val selectedEntry = _selectedEntry.asStateFlow()
 
-    private val _currentScreen = MutableLiveData<String>("Home")
-    val currentScreen: LiveData<String> = _currentScreen
-
-
-    fun setCurrentScreen(screen: String) {
-        _currentScreen.value = screen
-    }
-
-    fun setSelectedEntry(entry: Entries?) {
-        _selectedEntry.value = entry
-    }
+    private val _currentScreen = MutableStateFlow("Home")
+    val currentScreen = _currentScreen.asStateFlow()
 
     fun logOut() {
         viewModelScope.launch {
@@ -61,6 +52,14 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
             // Perform any additional cleanup or state updates necessary for logging out
         }
     }
+    fun setCurrentScreen(screen: String) {
+        _currentScreen.value = screen
+    }
+
+    fun setSelectedEntry(entry: Entries?) {
+        _selectedEntry.value = entry
+    }
+
 
     //ENTRIES METHODS
 

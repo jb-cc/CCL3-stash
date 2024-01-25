@@ -29,8 +29,8 @@ fun MainView(mainViewModel: MainViewModel) {
     Log.d("MainView", "MainView: $mainViewState")
     Log.d("MainView", "Got Users: $users")
 
-    val currentScreen by mainViewModel.currentScreen.observeAsState("Home")
-    val selectedEntry by mainViewModel.selectedEntry.observeAsState()
+    val selectedEntry by mainViewModel.selectedEntry.collectAsState()
+    val currentScreen by mainViewModel.currentScreen.collectAsState()
 
     if (mainViewState.isUserAuthenticated) {
         when (currentScreen) {
