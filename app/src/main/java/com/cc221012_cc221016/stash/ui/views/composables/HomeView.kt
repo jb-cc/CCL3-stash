@@ -18,12 +18,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.IconButton
-import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -41,11 +42,11 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -80,34 +81,39 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
             drawerState = drawerState,
             drawerContent = {
                 ModalDrawerSheet {
-
-
                     Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(vertical = 16.dp),
+                        verticalArrangement = Arrangement.Top // Align top part to the top
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Stash",
-                                style = MaterialTheme.typography.titleSmall,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
+                        // Top part with title
+                        Text(
+                            text = "Stash",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(16.dp)
+                        )
                         Divider()
-                        Spacer(modifier = Modifier.weight(1f))
+
+                        // Spacer to push the "Log out" button to the bottom
+                        Spacer(modifier = Modifier.weight(1f, fill = true))
+
+                        // "Log Out" button at the bottom
                         NavigationDrawerItem(
                             label = { Text(text = "Log out") },
+                            icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Log Out") },
                             selected = false,
-                            onClick = { mainViewModel.logOut()}
+                            onClick = { mainViewModel.logOut() },
+                            modifier = Modifier.align(Alignment.End)
                         )
                     }
                 }
             },
-            gesturesEnabled = true,
-        ) {
+            gesturesEnabled = true
+        )
+        {
 
 
             Box(
@@ -168,24 +174,7 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         // Load and display the favicon or the initial letter
-                                        if (isValidUrl(entry.entryUrl)) {
-                                            val faviconUrl = getFaviconUrl(entry.entryUrl)
-                                            Log.d(
-                                                "HomeView",
-                                                "Loading favicon for URL: $faviconUrl"
-                                            )
-                                            Image(
-                                                painter = rememberAsyncImagePainter(faviconUrl),
-                                                contentDescription = "Favicon",
-                                                modifier = Modifier.size(40.dp)
-                                            )
-                                        } else {
-                                            Log.d(
-                                                "HomeView",
-                                                "Invalid URL, showing initial: ${entry.entryName}"
-                                            )
-                                            EntryInitial(entryName = entry.entryName)
-                                        }
+                                        EntryItem(entry)
                                         Spacer(modifier = Modifier.width(16.dp)) // Add spacing here
 
                                         Column(
@@ -229,7 +218,7 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                 }
                 ExtendedFloatingActionButton(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
+                    contentColor = colorScheme.onPrimary,
                     onClick = {
                         onAddEntryClick()
                     },
@@ -263,16 +252,19 @@ fun isValidUrl(url: String): Boolean {
         return URLUtil.isValidUrl("http://$url")
     }
     // URL has a scheme, check it directly
-
     return URLUtil.isValidUrl(url)
 }
 
 @SuppressLint("RememberReturnType")
 @Composable
 fun getFaviconUrl(url: String): String {
-    Log.d("HomeView", "getFaviconUrl: $url")
-    val website = "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://$url&size=64"
-    return website
+    val processedUrl = if (url.startsWith("http://") || url.startsWith("https://")) {
+        url // URL already contains a protocol
+    } else {
+        "http://$url" // Add "http://" if URL does not have a protocol
+    }
+
+    return "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=$processedUrl&size=64"
 }
 @Composable
 fun EntryInitial(entryName: String) {
@@ -284,9 +276,28 @@ fun EntryInitial(entryName: String) {
             .padding(end = 8.dp)
     ) {
         Text(
-            text = "  " + entryName.take(1).uppercase() + " ",
+            text = "   " + entryName.take(1).uppercase() + " ",
             style = MaterialTheme.typography.titleMedium,
             color = Color.White
         )
+    }
+}
+
+@Composable
+fun EntryItem(entry: Entries) {
+    val imageUrl = getFaviconUrl(entry.entryUrl)
+    val loadError = remember { mutableStateOf(false) }
+
+    if (!loadError.value && isValidUrl(entry.entryUrl)) {
+        Image(
+            painter = rememberAsyncImagePainter(
+                model = imageUrl,
+                onError = { loadError.value = true }
+            ),
+            contentDescription = "Favicon",
+            modifier = Modifier.size(40.dp)
+        )
+    } else {
+        EntryInitial(entry.entryName)
     }
 }
