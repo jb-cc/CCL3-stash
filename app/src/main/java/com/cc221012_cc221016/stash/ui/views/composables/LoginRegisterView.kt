@@ -6,6 +6,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -43,11 +45,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.cc221012_cc221016.stash.R
 import com.cc221012_cc221016.stash.data.Users
@@ -105,6 +112,11 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                                 .fillMaxSize()
                                 .padding(top = 25.dp) // Fill the maximum size
                         ) {
+                            Text(
+                                text = "Please log in using your Masterpassword",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
 
                             OutlinedTextField(
                                 value = password,
@@ -164,7 +176,7 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth(0.67f)
-                                    .padding(bottom = 16.dp)
+                                    .padding(top = 40.dp)
                             ) {
                                 Text(text = "Log In")
                             }
@@ -175,6 +187,51 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                     var repeatPWisFocused by remember { mutableStateOf(false) }
                     var masterPasswordVisibility by remember { mutableStateOf(false) }
                     var repeatMasterPasswordVisibility by remember { mutableStateOf(false) }
+
+
+                    var showDialog by remember { mutableStateOf(true) }
+
+
+                    if (showDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showDialog = false },
+                            title = { Text(text = "Getting started") },
+                            text = {
+                                val styledText = buildAnnotatedString {
+                                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.bodyMedium.fontSize)) {
+                                        append("🔒 Your Privacy Comes First: \n")
+                                    }
+                                    append("We respect your privacy. Your data is yours alone, we do not have access to any of your data.\n\n")
+
+                                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.bodyMedium.fontSize)) {
+                                        append("🔑 Create Your Master Password: \n")
+                                    }
+                                    append("This is the only key to your digital vault. Make it strong and unique. Remember, your master password is not stored anywhere and cannot be recovered if forgotten.\n\n")
+
+                                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.bodyMedium.fontSize)) {
+                                        append("⚠️ Don't Forget: \n")
+                                    }
+                                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.bodyMedium.fontSize, color = MaterialTheme.colorScheme.error)) {
+                                        append("If you lose your master password, you lose access to your vault. If you uninstall the app, you lose access to your vault.")
+                                    }
+                                    append(" There's no way to reset it, as we don't keep a copy. This ensures that only you have access to your passwords.")
+                                }
+
+                                Text(text = styledText)
+                            },
+                            confirmButton = {
+                                Button(onClick = { showDialog = false }) {
+                                    Text("Okay")
+                                }
+                            }
+                        )
+
+                    }
+                    Text(
+                        text = "Create a Master Password to get started",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 16.dp).align(Alignment.CenterHorizontally)
+                    )
 
                     OutlinedTextField(
                         value = masterPassword,
@@ -295,10 +352,24 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                                 modifier = Modifier
                                     .fillMaxWidth(0.67f)
                                     .padding(bottom = 16.dp)
+
                             ) {
                                 Text(text = "Sign Up with MasterPassword")
                             }
-
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .clickable { showDialog = true }
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(top = 8.dp)
+                            ) {
+                                Text(
+                                    text = "Help",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    textDecoration = TextDecoration.Underline,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         }
                     }
                 }
