@@ -155,7 +155,7 @@ fun AddEntryView(
                     onValueChange = { emailValue.value = it },
                     isError = isEmailEmpty,
                     supportingText = { if (isEmailEmpty) Text("Required") },
-                    label = { Text("Email") },
+                    label = { Text("Email / Username") },
                     modifier = Modifier.fillMaxWidth().focusRequester(emailFocusRequester),
                     leadingIcon = {
                         Icon(

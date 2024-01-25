@@ -154,7 +154,7 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
                         isEmailEmpty = newValue.isEmpty()
                     },
                     supportingText = { if (isEmailEmpty) Text("Required") },
-                    label = { Text("Email") },
+                    label = { Text("Email / Username") },
                     isError = emailValue.value.isEmpty(),
                     modifier = Modifier.fillMaxWidth().focusRequester(emailFocusRequester),
                     leadingIcon = {

@@ -220,7 +220,7 @@ fun ShowEntryView(
                     Divider()
 
                     ListItem(
-                        headlineText = { Text("Email") },
+                        headlineText = { Text("Email / Username") },
                         supportingText = { Text(entry.entryUsername) },
                         leadingContent = {
                             Icon(
@@ -230,9 +230,9 @@ fun ShowEntryView(
                         },
                         trailingContent = {
                             IconButton(onClick = {
-                                val clip = ClipData.newPlainText("Email", entry.entryUsername)
+                                val clip = ClipData.newPlainText("Email / Username", entry.entryUsername)
                                 clipboardManager.setPrimaryClip(clip)
-                                Toast.makeText(context, "Email copied", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, "Email / Username copied", Toast.LENGTH_LONG).show()
                             }) {
                                 Icon(
                                     imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
