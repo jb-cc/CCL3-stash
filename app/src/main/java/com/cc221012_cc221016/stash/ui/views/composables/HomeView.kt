@@ -229,7 +229,7 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                 }
                 ExtendedFloatingActionButton(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
+                    contentColor = colorScheme.onPrimary,
                     onClick = {
                         onAddEntryClick()
                     },
