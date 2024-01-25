@@ -226,6 +226,7 @@ fun AddEntryView(
                                     val entryId = mainViewModel.saveEntry(newEntry)
                                     val savedEntry = mainViewModel.getEntryById(entryId.toInt())
                                     navigateToShowEntry(savedEntry)
+                                    Toast.makeText(context, "Created new entry", Toast.LENGTH_LONG).show()
 
                                 } catch (e: Exception) {
                                     Log.e("AddEntryView", "Error: ${e.message}")
