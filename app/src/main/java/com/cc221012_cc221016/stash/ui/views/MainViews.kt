@@ -2,9 +2,11 @@ package com.cc221012_cc221016.stash.ui.views
 
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import com.cc221012_cc221016.stash.models.MainViewModel
 import com.cc221012_cc221016.stash.ui.views.composables.AddEntryView
 import com.cc221012_cc221016.stash.ui.views.composables.EditEntryView
@@ -23,6 +25,7 @@ fun MainView(mainViewModel: MainViewModel) {
     Log.d("MainView", "MainView: $mainViewState")
     Log.d("MainView", "Got Users: $users")
 
+    val context = LocalContext.current
     val selectedEntry by mainViewModel.selectedEntry.collectAsState()
     val currentScreen by mainViewModel.currentScreen.collectAsState()
 
@@ -45,6 +48,9 @@ fun MainView(mainViewModel: MainViewModel) {
                     onDeleteEntry = { entryToDelete ->
                         mainViewModel.deleteEntry(entryToDelete)
                         mainViewModel.setCurrentScreen("Home")
+                        Toast.makeText(context, "Entry deleted", Toast.LENGTH_LONG).show()
+
+
                     },
                     onEditEntry = { entryToEdit ->
                         mainViewModel.setSelectedEntry(entryToEdit)

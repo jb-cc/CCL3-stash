@@ -1,5 +1,6 @@
 package com.cc221012_cc221016.stash.ui.views.composables
 
+import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -24,7 +25,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,6 +40,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
@@ -66,10 +67,10 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var masterPassword by remember { mutableStateOf(TextFieldValue("")) }
     var repeatMasterPassword by remember { mutableStateOf(TextFieldValue("")) }
-    val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
     var isPasswordInvalid by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
 
     Box(contentAlignment = Alignment.Center) {
@@ -156,6 +157,8 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                                     } else {
                                         coroutineScope.launch {
                                             isPasswordIncorrect = true
+                                            Toast.makeText(context, "Incorrect Password", Toast.LENGTH_LONG).show()
+
                                         }
                                     }
                                 },
@@ -233,15 +236,7 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                                 if (masterPassword.text == repeatMasterPassword.text) {
                                     val newUser = Users(masterPassword.text)
                                     viewModel.saveUser(newUser)
-                                } else {
-//                                    coroutineScope.launch {
-//                                        snackbarHostState.showSnackbar("Passwords do not match")
-//                                    }
                                 }
-                            } else {
-//                                coroutineScope.launch {
-//                                    snackbarHostState.showSnackbar("Password does not meet the requirements")
-//                                }
                             }
                         }),
                         trailingIcon = {
@@ -286,21 +281,15 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                             Button(
                                 onClick = {
                                     if (isPasswordValid(masterPassword.text)) {
-
-
                                         if (masterPassword.text == repeatMasterPassword.text) {
                                             val newUser = Users(masterPassword.text)
                                             viewModel.saveUser(newUser)
                                         } else {
-                                            coroutineScope.launch {
-                                                snackbarHostState.showSnackbar("Passwords do not match")
-                                            }
+                                            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_LONG).show()
                                         }
                                     } else {
                                         isPasswordInvalid = true
-//                                        coroutineScope.launch {
-//                                            snackbarHostState.showSnackbar("Password does not meet the requirements")
-//                                        }
+                                        Toast.makeText(context, "Password does not meet the requirements", Toast.LENGTH_LONG).show()
                                     }
                                 },
                                 modifier = Modifier
@@ -311,12 +300,6 @@ fun LoginRegisterView(user: Users?, viewModel: MainViewModel) {
                             }
 
                         }
-//                        SnackbarHost(
-//                            hostState = snackbarHostState,
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .align(Alignment.BottomCenter)
-//                        )
                     }
                 }
             }

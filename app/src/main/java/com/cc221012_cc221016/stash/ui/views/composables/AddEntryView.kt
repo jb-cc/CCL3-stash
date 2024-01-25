@@ -1,6 +1,7 @@
 package com.cc221012_cc221016.stash.ui.views.composables
 
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
@@ -23,8 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -36,8 +37,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -58,11 +64,16 @@ fun AddEntryView(
     val urlValue = rememberSaveable { mutableStateOf("") }
     val emailValue = rememberSaveable { mutableStateOf("") }
     val passwordValue = rememberSaveable { mutableStateOf("") }
-    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var isNameEmpty by remember { mutableStateOf(false) }
     var isEmailEmpty by remember { mutableStateOf(false) }
     var isPasswordEmpty by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+    val nameFocusRequester = remember { FocusRequester() }
+    val urlFocusRequester = remember { FocusRequester() }
+    val emailFocusRequester = remember { FocusRequester() }
+    val passwordFocusRequester = remember { FocusRequester() }
+    val context = LocalContext.current
 
     val colorScheme = colorScheme
     BackHandler {
@@ -108,13 +119,15 @@ fun AddEntryView(
                     isError = isNameEmpty,
                     supportingText = { if (isNameEmpty) Text("Required") },
                     label = { Text("Name") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(nameFocusRequester),
                     leadingIcon = {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.star),
                             contentDescription = "Star Icon"
                         )
                     },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { urlFocusRequester.requestFocus() }),
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -124,13 +137,15 @@ fun AddEntryView(
                     value = urlValue.value,
                     onValueChange = { urlValue.value = it },
                     label = { Text("URL") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(urlFocusRequester),
                     leadingIcon = {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.link),
                             contentDescription = "URL Icon"
                         )
                     },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { emailFocusRequester.requestFocus() }),
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -141,13 +156,15 @@ fun AddEntryView(
                     isError = isEmailEmpty,
                     supportingText = { if (isEmailEmpty) Text("Required") },
                     label = { Text("Email") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(emailFocusRequester),
                     leadingIcon = {
                         Icon(
                             Icons.Outlined.Email,
                             contentDescription = "Email Icon"
                         )
                     },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { passwordFocusRequester.requestFocus() }),
 
                 )
 
@@ -159,7 +176,7 @@ fun AddEntryView(
                     isError = isPasswordEmpty,
                     supportingText = { if (isPasswordEmpty) Text("Required") },
                     label = { Text("Password") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(passwordFocusRequester),
                     visualTransformation = if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
                     leadingIcon = {
                         Icon(
@@ -179,6 +196,8 @@ fun AddEntryView(
                             )
                         }
                     },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 )
             }
             Column(
@@ -187,15 +206,11 @@ fun AddEntryView(
                     .padding(16.dp)
                     .align(Alignment.BottomCenter)
             ){
-                SnackbarHost(
-                    hostState = snackbarHostState,
-                )
+
                 Button(
                     onClick = {
                         if (nameValue.value.isEmpty() || emailValue.value.isEmpty() || passwordValue.value.isEmpty()) {
-//                        scope.launch {
-//                            snackbarHostState.showSnackbar("Please fill out all mandatory fields.")
-//                        }
+                            Toast.makeText(context, "Please fill out all mandatory fields.", Toast.LENGTH_LONG).show()
                             isNameEmpty = nameValue.value.isEmpty()
                             isEmailEmpty = emailValue.value.isEmpty()
                             isPasswordEmpty = passwordValue.value.isEmpty()
@@ -214,7 +229,7 @@ fun AddEntryView(
 
                                 } catch (e: Exception) {
                                     Log.e("AddEntryView", "Error: ${e.message}")
-                                    snackbarHostState.showSnackbar("Error saving entry")
+                                    Toast.makeText(context, "Error saving entry", Toast.LENGTH_LONG).show()
                                 }
                             }
                         }
