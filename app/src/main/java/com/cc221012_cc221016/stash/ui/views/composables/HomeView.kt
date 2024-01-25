@@ -84,7 +84,7 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(vertical = 16.dp),
-                        verticalArrangement = Arrangement.Top // Align items to the top
+                        verticalArrangement = Arrangement.SpaceBetween // Align items to the top
                     ) {
                         Text(
                             text = "Stash",
@@ -101,7 +101,7 @@ fun HomeView(mainViewModel: MainViewModel, navigateToShowEntry: (Entries) -> Uni
                             icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Log Out") },
                             selected = false,
                             onClick = { mainViewModel.logOut() },
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                            modifier = Modifier.align(Alignment.End)
                         )
                     }
                 }
@@ -252,8 +252,13 @@ fun isValidUrl(url: String): Boolean {
 @SuppressLint("RememberReturnType")
 @Composable
 fun getFaviconUrl(url: String): String {
-    Log.d("HomeView", "getFaviconUrl: $url")
-    return "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://$url&size=64"
+    val processedUrl = if (url.startsWith("http://") || url.startsWith("https://")) {
+        url // URL already contains a protocol
+    } else {
+        "http://$url" // Add "http://" if URL does not have a protocol
+    }
+
+    return "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=$processedUrl&size=64"
 }
 @Composable
 fun EntryInitial(entryName: String) {
