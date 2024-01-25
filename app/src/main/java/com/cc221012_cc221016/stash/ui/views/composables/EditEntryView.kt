@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
@@ -30,14 +32,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -60,6 +65,11 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
     var isNameEmpty by remember { mutableStateOf(false) }
     var isEmailEmpty by remember { mutableStateOf(false) }
     var isPasswordEmpty by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+    val nameFocusRequester = remember { FocusRequester() }
+    val urlFocusRequester = remember { FocusRequester() }
+    val emailFocusRequester = remember { FocusRequester() }
+    val passwordFocusRequester = remember { FocusRequester() }
 
 
 
@@ -104,17 +114,19 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
                         nameValue.value = newValue
                         isNameEmpty = newValue.isEmpty()
                     },
-                    supportingText = { if (isNameEmpty) Text("Required") },
                     label = { Text("Name") },
                     isError = nameValue.value.isEmpty(),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(nameFocusRequester),
                     leadingIcon = {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.star),
                             contentDescription = "Star Icon"
                         )
                     },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { urlFocusRequester.requestFocus() }),
                 )
+                if (isNameEmpty) Text("Required")
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -122,13 +134,15 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
                     value = urlValue.value,
                     onValueChange = { urlValue.value = it },
                     label = { Text("URL") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(urlFocusRequester),
                     leadingIcon = {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.link),
                             contentDescription = "URL Icon"
                         )
                     },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { emailFocusRequester.requestFocus() }),
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -142,13 +156,15 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
                     supportingText = { if (isEmailEmpty) Text("Required") },
                     label = { Text("Email") },
                     isError = emailValue.value.isEmpty(),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(emailFocusRequester),
                     leadingIcon = {
                         Icon(
                             Icons.Outlined.Email,
                             contentDescription = "Email Icon"
                         )
                     },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { passwordFocusRequester.requestFocus() }),
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -162,7 +178,7 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
                     supportingText = { if (isPasswordEmpty) Text("Required") },
                     label = { Text("Password") },
                     isError = passwordValue.value.isEmpty(),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(passwordFocusRequester),
                     visualTransformation = if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
                     leadingIcon = {
                         Icon(
@@ -181,7 +197,9 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
                                 contentDescription = if (passwordVisibility.value) "Hide password" else "Show password"
                             )
                         }
-                    }
+                    },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 )
             }
             Column(
