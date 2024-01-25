@@ -1,6 +1,7 @@
 package com.cc221012_cc221016.stash.ui.views.composables
 
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,8 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -41,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
@@ -64,7 +64,6 @@ fun AddEntryView(
     val urlValue = rememberSaveable { mutableStateOf("") }
     val emailValue = rememberSaveable { mutableStateOf("") }
     val passwordValue = rememberSaveable { mutableStateOf("") }
-    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var isNameEmpty by remember { mutableStateOf(false) }
     var isEmailEmpty by remember { mutableStateOf(false) }
@@ -74,6 +73,7 @@ fun AddEntryView(
     val urlFocusRequester = remember { FocusRequester() }
     val emailFocusRequester = remember { FocusRequester() }
     val passwordFocusRequester = remember { FocusRequester() }
+    val context = LocalContext.current
 
     val colorScheme = colorScheme
     BackHandler {
@@ -206,15 +206,11 @@ fun AddEntryView(
                     .padding(16.dp)
                     .align(Alignment.BottomCenter)
             ){
-                SnackbarHost(
-                    hostState = snackbarHostState,
-                )
+
                 Button(
                     onClick = {
                         if (nameValue.value.isEmpty() || emailValue.value.isEmpty() || passwordValue.value.isEmpty()) {
-//                        scope.launch {
-//                            snackbarHostState.showSnackbar("Please fill out all mandatory fields.")
-//                        }
+                            Toast.makeText(context, "Please fill out all mandatory fields.", Toast.LENGTH_LONG).show()
                             isNameEmpty = nameValue.value.isEmpty()
                             isEmailEmpty = emailValue.value.isEmpty()
                             isPasswordEmpty = passwordValue.value.isEmpty()
@@ -233,7 +229,7 @@ fun AddEntryView(
 
                                 } catch (e: Exception) {
                                     Log.e("AddEntryView", "Error: ${e.message}")
-                                    snackbarHostState.showSnackbar("Error saving entry")
+                                    Toast.makeText(context, "Error saving entry", Toast.LENGTH_LONG).show()
                                 }
                             }
                         }
