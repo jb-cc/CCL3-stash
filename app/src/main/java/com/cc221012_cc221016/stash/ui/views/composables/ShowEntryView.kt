@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -33,8 +32,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -42,7 +39,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,11 +47,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.dp
 import com.cc221012_cc221016.stash.R
 import com.cc221012_cc221016.stash.data.Entries
 import com.cc221012_cc221016.stash.models.MainViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,8 +67,6 @@ fun ShowEntryView(
     //val password = remember { mutableStateOf("password123") }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
     val menuExpanded = remember { mutableStateOf(false) }
     val showDialog = remember { mutableStateOf(false) }
     val entryState = remember { mutableStateOf<Entries?>(null) }
@@ -214,9 +206,7 @@ fun ShowEntryView(
                                 IconButton(onClick = {
                                     val clip = ClipData.newPlainText("URL", entry.entryUrl)
                                     clipboardManager.setPrimaryClip(clip)
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar("URL copied")
-                                    }
+                                    Toast.makeText(context, "URL copied", Toast.LENGTH_LONG).show()
                                 }) {
                                     Icon(
                                         imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
@@ -242,9 +232,7 @@ fun ShowEntryView(
                             IconButton(onClick = {
                                 val clip = ClipData.newPlainText("Email", entry.entryUsername)
                                 clipboardManager.setPrimaryClip(clip)
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("Email copied")
-                                }
+                                Toast.makeText(context, "Email copied", Toast.LENGTH_LONG).show()
                             }) {
                                 Icon(
                                     imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
@@ -280,9 +268,7 @@ fun ShowEntryView(
                                 IconButton(onClick = {
                                     val clip = ClipData.newPlainText("Password", entry.entryPassword)
                                     clipboardManager.setPrimaryClip(clip)
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar("Password copied")
-                                    }
+                                    Toast.makeText(context, "Password copied", Toast.LENGTH_LONG).show()
                                 }) {
                                     Icon(
                                         imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
@@ -294,16 +280,6 @@ fun ShowEntryView(
                     )
 
                     Divider()
-                }
-
-                Column(
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxSize().padding(16.dp)
-                ) {
-                    SnackbarHost(
-                        hostState = snackbarHostState
-                    )
                 }
             }
         } else {
