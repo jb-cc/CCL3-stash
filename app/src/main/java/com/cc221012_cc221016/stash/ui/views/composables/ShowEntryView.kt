@@ -3,7 +3,12 @@ package com.cc221012_cc221016.stash.ui.views.composables
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -74,6 +79,7 @@ fun ShowEntryView(
     val showDialog = remember { mutableStateOf(false) }
     val entryState = remember { mutableStateOf<Entries?>(null) }
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val openInBrowserLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
 
     LaunchedEffect(entryId) {
         entryState.value = mainViewModel.getEntryById(entryId)
@@ -190,17 +196,33 @@ fun ShowEntryView(
                             )
                         },
                         trailingContent = {
-                            IconButton(onClick = {
-                                val clip = ClipData.newPlainText("URL", entry.entryUrl)
-                                clipboardManager.setPrimaryClip(clip)
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("URL copied")
+                            Row {
+                                IconButton(onClick = {
+                                    val formattedUrl = formatUrl(entry.entryUrl)
+                                    if (formattedUrl != null){
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(formattedUrl))
+                                        openInBrowserLauncher.launch(intent)
+                                    } else {
+                                        Toast.makeText(context, "Invalid URL.", Toast.LENGTH_LONG).show()
+                                    }
+                                }) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(id = R.drawable.open_in_new),
+                                        contentDescription = "Open in Browser Icon"
+                                    )
                                 }
-                            }) {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
-                                    contentDescription = "Copy Icon"
-                                )
+                                IconButton(onClick = {
+                                    val clip = ClipData.newPlainText("URL", entry.entryUrl)
+                                    clipboardManager.setPrimaryClip(clip)
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("URL copied")
+                                    }
+                                }) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(id = R.drawable.content_copy),
+                                        contentDescription = "Copy Icon"
+                                    )
+                                }
                             }
                         }
                     )
@@ -290,5 +312,18 @@ fun ShowEntryView(
                 CircularProgressIndicator()
             }
         }
+    }
+}
+
+fun formatUrl(url: String): String? {
+    val urlRegex = "^(http://www.|https://www.|http://|https://)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(/.*)?$".toRegex()
+    return if (urlRegex.matches(url)) {
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            "http://$url"
+        } else {
+            url
+        }
+    } else {
+        null
     }
 }
