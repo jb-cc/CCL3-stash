@@ -229,6 +229,8 @@ fun EditEntryView(entry: Entries, onBack: () -> Unit,  onSave: (Entries) -> Unit
                             entryID = entry.entryID // Preserve the original ID
                         )
                         onSave(updatedEntry) // Save the updated entry
+                        Toast.makeText(context, "Entry updated", Toast.LENGTH_LONG).show()
+
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorScheme.primary,
