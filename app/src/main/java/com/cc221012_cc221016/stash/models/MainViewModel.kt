@@ -1,22 +1,18 @@
 package com.cc221012_cc221016.stash.models
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cc221012_cc221016.stash.data.Entries
 import com.cc221012_cc221016.stash.data.EntriesDao
-import com.cc221012_cc221016.stash.data.UsersDao
 import com.cc221012_cc221016.stash.data.Users
-import com.cc221012_cc221016.stash.ui.views.Screen
+import com.cc221012_cc221016.stash.data.UsersDao
 import com.cc221012_cc221016.stash.ui.state.MainViewState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -64,16 +60,7 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
     //ENTRIES METHODS
 
     //Save an entry
-    /*
-    fun saveEntry(entry: Entries){
-        viewModelScope.launch {
-            entriesDao.insertEntry(entry)
-            Log.d("MainViewModel", "saveEntry: ${entry.entryName}")
-            getEntries()
-        }
-    }
 
-    */
     suspend fun saveEntry(entry: Entries): Long {
         val id = entriesDao.insertEntry(entry)
         getEntries() // Update entries list
@@ -84,15 +71,8 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
         return entriesDao.getEntry(id.toLong()).first()
     }
 
-    fun fetchEntryById(id: Long) {
-        viewModelScope.launch {
-            val entry = entriesDao.getEntry(id).firstOrNull()
-            _selectedEntry.value = entry
-        }
-    }
-
     //Get all entries
-    fun getEntries() {
+    private fun getEntries() {
         viewModelScope.launch {
             entriesDao.getEntries().collect { allEntries ->
                 Log.d("MainViewModel", "Fetched entries: $allEntries")
@@ -102,15 +82,6 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
     }
 
 
-    //Get an entry
-    fun getEntry(id: Long){
-        viewModelScope.launch {
-            entriesDao.getEntry(id).collect(){ entry ->
-                _entriesState.update { entry }
-            }
-        }
-    }
-
     //Update an entry
     fun updateEntry(entry: Entries) {
         viewModelScope.launch {
@@ -119,12 +90,7 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
         }
     }
 
-    //edit an entry
 
-    fun editEntry(entry: Entries){
-        _entriesState.value = entry
-        _mainViewState.update { it.copy(openDialog = true) }
-    }
 
     //delete an entry
 
@@ -154,7 +120,7 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
     }
 
     //Get a user
-    fun getUsers(){
+    private fun getUsers(){
 
         viewModelScope.launch {
             usersDao.getUsers().collect(){ allUsers ->
@@ -180,13 +146,4 @@ class MainViewModel(private val entriesDao: EntriesDao, private val usersDao: Us
     }
 
 
-
-
-    fun selectScreen(screen: Screen){
-        _mainViewState.update { it.copy(selectedScreen = screen) }
-    }
-
-    fun closeDialog(){
-        _mainViewState.update { it.copy(openDialog = false) }
-    }
 }
