@@ -3,6 +3,9 @@
 ## Overview
 Stash is a password manager application, developed in a team of two. This app provides a secure and user-friendly platform for managing your passwords.
 
+## Download
+You can download the apk [here](https://ccl3.jonasbeer.com/)
+
 ## Features
 - **Secure Storage**: Passwords are stored securely using advanced encryption methods.
 - **Encryption with Keystore**: Utilizes Android's Keystore system for robust encryption and data protection.
