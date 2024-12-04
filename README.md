@@ -1,5 +1,7 @@
 # Stash - Password Manager
 
+![Stash.png](Stash.png)
+
 ## Overview
 Stash is a password manager application, developed in a team of two. This app provides a secure and user-friendly platform for managing your passwords.
 
